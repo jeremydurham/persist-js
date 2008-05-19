@@ -20,6 +20,8 @@ Test = {
     // create new persistent store
     Test.store = new Persist.Store('test');
 
+    Test.get('type').innerHTML = Persist.type;
+
     // attach callbacks
     Test.get('load-btn').onclick = Test.load;
     Test.get('save-btn').onclick = Test.save;
