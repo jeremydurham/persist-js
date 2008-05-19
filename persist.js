@@ -70,7 +70,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
 
         // make sure openDatabase works
         // XXX: will this leak a db handle and/or waste space?
-        if (!window.openDatabase('PersistJS Test', '', '', B.db.size))
+        if (!window.openDatabase('PersistJS Test', '', 'Persistent database test', B.db.size))
           return false;
 
         return true;
@@ -115,7 +115,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
 
           // begin transaction
           this.transaction(function (t) {
-            t.executeSql(sql, [key], function(r) {
+            t.executeSql(sql, [key], function(t, r) {
               if (r.rows.length > 0)
                 fn.call(scope, true, r.rows.item(0)['v']);
               else
@@ -134,7 +134,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
             // exec remove query
             t.executeSql(rm_sql, [key], function() {
               // exec set query
-              t.executeSql(sql, [key, val], function(r) {
+              t.executeSql(sql, [key, val], function(t, r) {
                 // run callback
                 if (fn)
                   fn.call(scope, true, val);
@@ -155,13 +155,13 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
             // value before removing it
             if (fn) {
               // exec get query
-              t.executeSql(get_sql, [key], function(r) {
+              t.executeSql(get_sql, [key], function(t, r) {
                 if (r.rows.length > 0) {
                   // key exists, get value 
                   var val = r.rows.item(0)['v'];
 
                   // exec remove query
-                  t.executeSql(sql, [key], function(r) {
+                  t.executeSql(sql, [key], function(t, r) {
                     // exec callback
                     fn.call(scope, true, val);
                   });
