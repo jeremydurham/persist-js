@@ -242,14 +242,17 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
         if (!document.attachEvent)
           return false;
 
-        // create new userdata element, then test to see if
-        // the load method is defined
+        // create test userdata element
         var el = B.ie.make_userdata(B.ie.test_id);
+
+        // test to see if the load method is defined
         return el.load ? true : false;
       },
 
       make_userdata: function(id) {
         var el = document.createElement('div');
+
+        // set element attributes
         el.setAttribute('id', id);
         el.setAttribute('className', 'userData');
         el.style.setAttribute('cssText', B.ie.style);
@@ -396,6 +399,9 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
           P.Store.prototype[key] = b.methods[key];
       }
     }
+
+    // mark library as initialized
+    P._init = true;
   };
 
   // create top-level namespace
@@ -405,6 +411,9 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
 
     // backend type
     type: null,
+
+    // expose init function
+    init: init,
 
     add: function(o) {
       // add to backend hash
@@ -437,6 +446,8 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
 
     // store API
     Store: function(name, o) {
+      if (!P._init)
+        init();
       if (!P.type)
         throw new Error("No suitable storage found");
 
@@ -456,6 +467,5 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
   };
 
   // init perssist and return top-level namespace
-  init();
   return P;
 })();
