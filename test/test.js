@@ -18,9 +18,7 @@ Test = {
 
   init: function() {
     // create new persistent store
-    Test.store = new Persist.Store('test', { 
-      domain: 'localdomain'
-    });
+    Test.store = new Persist.Store('test');
 
     // attach callbacks
     Test.get('load-btn').onclick = Test.load;
