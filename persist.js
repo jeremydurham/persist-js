@@ -242,11 +242,14 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
         if (!document.attachEvent)
           return false;
 
-        // create test userdata element
-        var el = B.ie.make_userdata(B.ie.test_id);
-
-        // test to see if the load method is defined
-        return el.load ? true : false;
+/* 
+ *         // create test userdata element
+ *         var el = B.ie.make_userdata(B.ie.test_id);
+ * 
+ *         // test to see if the load method is defined
+ *         return (el.load ? true : false);
+ */ 
+        return true;
       },
 
       make_userdata: function(id) {
