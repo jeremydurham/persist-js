@@ -233,7 +233,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
     // IE backend
     ie: {
       prefix: '_persist_data-',
-      style: 'display:none; behavior:url(#default#userdata)',
+      style: 'display:none; behavior:url(#default#userdata);',
 
       test: function() {
         // TODO: test load/save
@@ -248,7 +248,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
           var el = document.createElement('div');
           el.setAttribute('id', id);
           el.setAttribute('className', 'userData');
-          el.setAttribute('style', B.ie.style);
+          el.style.setAttribute('cssText', B.ie.style);
 
           // append element to body
           document.body.appendChild(el);
