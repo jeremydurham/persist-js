@@ -244,15 +244,24 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
           var id = B.ie.prefix + esc(this.name);
 
           // lazy-load userdata element
-          document.write([
-            "<div class='userdata' ",
-              "style='display:none; behavior:url(#default#userdata)' ",
-              "id='" + id + "'>",
-            "</div>"
-          ].join(''));
+          var el = document.createElement('div');
+          el.setAttribute('id', id);
+          el.setAttribute('class', 'userdata');
+          el.setAttribute('style', 'display:none; behavior:url(#default#userdata)');
 
-          // XXX: will this work?
-          this.el =  document.getElementById(id);
+          // append element to body
+          document.body.appendChild(el);
+
+/* 
+ *           document.write([
+ *             "<div class='userdata' ",
+ *               "style='display:none; behavior:url(#default#userdata)' ",
+ *               "id='" + id + "'>",
+ *             "</div>"
+ *           ].join(''));
+ */ 
+
+          this.el = el;
           this.load();
         },
 
