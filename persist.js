@@ -429,7 +429,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
       this.name = name;
 
       // XXx: does this work?
-      o.domain = o.domain || location.domain || 'localdomain';
+      o.domain = o.domain || location.hostname || 'localdomain';
       this.o = o;
 
       // expires in 2 years
