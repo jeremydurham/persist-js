@@ -12,7 +12,7 @@ Test = {
   },
 
   save: function() {
-    var val = Test.get('data').value = val;
+    var val = Test.get('data').value;
     Test.store.set('some_key', val);
   },
 
