@@ -233,6 +233,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
     // IE backend
     ie: {
       prefix: '_persist_data-',
+      style: 'display:none; behavior:url(#default#userdata)',
 
       test: function() {
         // TODO: test load/save
@@ -246,21 +247,13 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
           // lazy-load userdata element
           var el = document.createElement('div');
           el.setAttribute('id', id);
-          el.setAttribute('class', 'userdata');
-          el.setAttribute('style', 'display:none; behavior:url(#default#userdata)');
+          el.setAttribute('className', 'userData');
+          el.setAttribute('style', B.ie.style);
 
           // append element to body
           document.body.appendChild(el);
 
-/* 
- *           document.write([
- *             "<div class='userdata' ",
- *               "style='display:none; behavior:url(#default#userdata)' ",
- *               "id='" + id + "'>",
- *             "</div>"
- *           ].join(''));
- */ 
-
+          // save element and load data
           this.el = el;
           this.load();
         },
