@@ -1,7 +1,8 @@
 Persist = (function() {
   var VERSION = '0.1.0', P, B, esc, init, empty, ec;
 
-  // easycookie 0.2.1 (http://pablotron.org/software/easy_cookie/)
+  // easycookie 0.2.1 (pre-minified)
+  // (see http://pablotron.org/software/easy_cookie/)
   ec = (function(){var EPOCH='Thu, 01-Jan-1970 00:00:01 GMT',RATIO=1000*60*60*24,KEYS=['expires','path','domain'],esc=escape,un=unescape,doc=document,me;var get_now=function(){var r=new Date();r.setTime(r.getTime());return r;}
 var cookify=function(c_key,c_val){var i,key,val,r=[],opt=(arguments.length>2)?arguments[2]:{};r.push(esc(c_key)+'='+esc(c_val));for(i=0;i<KEYS.length;i++){key=KEYS[i];if(val=opt[key])
 r.push(key+'='+val);}
@@ -232,26 +233,38 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
     
     // IE backend
     ie: {
-      prefix: '_persist_data-',
-      style: 'display:none; behavior:url(#default#userdata);',
+      prefix:   '_persist_data-',
+      test_id:  '_persist_data_test',
+      style:    'display:none; behavior:url(#default#userdata);',
 
       test: function() {
-        // TODO: test load/save
-        return document.attachEvent ? true : false;
+        // make sure we're dealing with IE
+        if (!document.attachEvent)
+          return false;
+
+        // create new userdata element, then test to see if
+        // the load method is defined
+        var el = B.ie.make_userdata(B.ie.test_id);
+        return el.load ? true : false;
+      },
+
+      make_userdata: function(id) {
+        var el = document.createElement('div');
+        el.setAttribute('id', id);
+        el.setAttribute('className', 'userData');
+        el.style.setAttribute('cssText', B.ie.style);
+
+        // append element to body
+        document.body.appendChild(el);
+
+        // return element
+        return el;
       },
 
       methods: {
         init: function() {
-          var id = B.ie.prefix + esc(this.name);
-
-          // lazy-load userdata element
-          var el = document.createElement('div');
-          el.setAttribute('id', id);
-          el.setAttribute('className', 'userData');
-          el.style.setAttribute('cssText', B.ie.style);
-
-          // append element to body
-          document.body.appendChild(el);
+          var id = B.ie.prefix + esc(this.name),
+              el = B.ie.make_userdata(id);
 
           // save element and load data
           this.el = el;
