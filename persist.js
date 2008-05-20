@@ -53,12 +53,13 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
       'save'
     ],
 
-    // whatwg db backend (Safari 3.1+)
+    // whatwg db backend (webkit, Safari 3.1+)
+    // (src: whatwg and http://webkit.org/misc/DatabaseExample.html)
     db: {
       size:   200 * 1024,
 
       sql: {
-        create: "CREATE TABLE persist_data (k TEXT UNIQUE, v TEXT)",
+        create: "CREATE TABLE persist_data (k TEXT UNIQUE NOT NULL, v TEXT NOT NULL)",
         get:    "SELECT v FROM persist_data WHERE k = ?",
         set:    "INSERT INTO persist_data(k, v) VALUES (?, ?)",
         remove: "DELETE FROM persist_data WHERE k = ?" 
@@ -184,6 +185,9 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
     }, 
     
     // dom backend (globalStorage, FF2+, IE8+)
+    // (src: http://developer.mozilla.org/en/docs/DOM:Storage#globalStorage)
+    // TODO: test to see if IE8 uses object literal semantics or
+    // getItem/setItem/removeItem semantics
     dom: {
       test: function() {
         return window.globalStorage ? true : false;
@@ -407,7 +411,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
     type: null,
 
     // expose init function
-    init: init,
+    // init: init,
 
     add: function(o) {
       // add to backend hash
