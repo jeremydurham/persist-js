@@ -1,3 +1,28 @@
+//
+// Copyright (c) 2008 Paul Duncan (paul@pablotron.org)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+
+/**
+ * Persist - top-level namespace for Persist library.
+ */
 Persist = (function() {
   var VERSION = '0.1.0', P, B, esc, init, empty, ec;
 
@@ -24,9 +49,11 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
   // escape spaces in name
   esc = function(str) {
     return 'PS' + str.replace(/_/g, '__').replace(/ /g, '_s');
-  }
+  };
 
-  B = {
+
+
+  C = {
     /* 
      * Backend search order.
      * 
@@ -39,8 +66,9 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
       // TODO: flash, gears, air, whatwg localStorage (webkit)
       // 'localstorage',
       'gears',
-      'db', 
-      'dom', 
+      'localstorage',
+      'whatwg_db', 
+      'globalstorage', 
       'ie', 
       'cookie'
     ],
@@ -53,44 +81,46 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
       'remove', 
       'load', 
       'save'
+      // TODO: clear
     ],
 
-    // whatwg db backend (webkit, Safari 3.1+)
-    // (src: whatwg and http://webkit.org/misc/DatabaseExample.html)
-    db: {
-      size:   200 * 1024,
+    // sql for db backends (gears and db)
+    sql: {
+      version:  '1', // db schema version
 
-      sql: {
-        create: "CREATE TABLE persist_data (k TEXT UNIQUE NOT NULL, v TEXT NOT NULL)",
-        get:    "SELECT v FROM persist_data WHERE k = ?",
-        set:    "INSERT INTO persist_data(k, v) VALUES (?, ?)",
-        remove: "DELETE FROM persist_data WHERE k = ?" 
-      },
-       
+      create:   "CREATE TABLE persist_data (k TEXT UNIQUE NOT NULL, v TEXT NOT NULL)",
+      get:      "SELECT v FROM persist_data WHERE k = ?",
+      set:      "INSERT INTO persist_data(k, v) VALUES (?, ?)",
+      remove:   "DELETE FROM persist_data WHERE k = ?" 
+    } 
+  };
+
+  // built-in backends
+  B = {
+    // gears db backend (webkit, Safari 3.1+)
+    // (src: http://code.google.com/apis/gears/api_database.html)
+    gears: {
+      // no known limit
+      size:   -1,
+
       test: function() {
-        // test for openDatabase
-        if (!window.openDatabase)
-          return false;
-
-        // make sure openDatabase works
-        // XXX: will this leak a db handle and/or waste space?
-        if (!window.openDatabase('PersistJS Test', '', 'Persistent database test', B.db.size))
-          return false;
-
-        return true;
+        // test for gears
+        return (window.google && window.google.gears) ? true : false;
       },
 
       methods: {
         transaction: function(fn) {
           if (!this.db_created) {
-            var sql = B.db.sql.create;
+            var sql = C.sql.create;
 
-            this.db.transaction(function(t) {
-              // create table
-              t.executeSql(sql, [], function() {
-                this.db_created = true;
+            this.db_created = true;
+
+            // create table
+            try {
+              this.db.transaction(function(t) {
+                t.execute(sql, []);
               });
-            });
+            } catch (err) { } // trap exception
           } 
 
           this.db.transaction(fn);
@@ -101,14 +131,159 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
           
           // init description and size
           desc = this.o.description || "Persistent storage for " + this.name;
-          size = this.o.size || B.db.size;
 
           // create database handle
-          this.db = openDatabase(this.name, this.o.version || '', desc, size);
+          this.db = google.gears.factory.create('beta.database');
+
+          // open database
+          // from gears ref:
+          //
+          // Currently the name, if supplied and of length greater than
+          // zero, must consist only of visible ASCII characters
+          // excluding the following characters:
+          //
+          //   / \ : * ? " < > | ; ,
+          db.open(desc);
+
+          // add transaction handler
+          this.db.transaction = function(fn) {
+            // begin transaction
+            this.execute('BEGIN');
+
+            // call callback fn
+            fn.call(this, this);
+
+            // commit changes
+            this.execute('COMMIT');
+          };
         },
 
         get: function(key, fn, scope) {
-          var sql = B.db.sql.get;
+          var r, sql = C.sql.get;
+
+          // if callback isn't defined, then return
+          if (!fn)
+            return;
+
+          // begin transaction
+          this.transaction(function (t) {
+            // exec query
+            r = t.execute(sql, [key]);
+
+            // call callback
+            if (r.isValidRow())
+              fn.call(scope || this, true, r.field(0));
+            else
+              fn.call(scope || this, false, null);
+          });
+        },
+
+        set: function(key, val, fn, scope) {
+          var rm_sql = C.sql.remove,
+              sql    = C.sql.set, r;
+
+          // begin set transaction
+          this.transaction(function(t) {
+            // exec remove query
+            r = t.execute(rm_sql, [key]);
+
+            // exec set query
+            t.execute(sql, [key, val]);
+            
+            // run callback
+            if (fn)
+              fn.call(scope || this, true, val);
+          });
+        },
+
+        // begin remove transaction
+        remove: function(key, fn, scope) {
+          var get_sql = C.sql.get;
+              sql = C.sql.remove,
+              r, val;
+
+          this.transaction(function(t) {
+            // if a callback was defined, then get the old
+            // value before removing it
+            if (fn) {
+              // exec get query
+              r = t.execute(get_sql, [key]);
+
+              if (r.isValidRow()) {
+                // key exists, get value 
+                val = r.field(0);
+
+                // exec remove query
+                t.execute(sql, [key]);
+
+                // exec callback
+                fn.call(scope || this, true, val);
+              } else {
+                // key does not exist, exec callback
+                fn.call(scope || this, false, null);
+              }
+            } else {
+              // no callback was defined, so just remove the
+              // data without checking the old value
+
+              // exec remove query
+              t.execute(sql, [key]);
+            }
+          });
+        } 
+      }
+    }, 
+
+    // whatwg db backend (webkit, Safari 3.1+)
+    // (src: whatwg and http://webkit.org/misc/DatabaseExample.html)
+    whatwg_db: {
+      size:   200 * 1024,
+
+      test: function() {
+        var name = 'PersistJS Test', 
+            desc = 'Persistent database test.',
+
+        // test for openDatabase
+        if (!window.openDatabase)
+          return false;
+
+        // make sure openDatabase works
+        // XXX: will this leak a db handle and/or waste space?
+        if (!window.openDatabase(name, C.sql.version, desc, B.whatwg_db.size))
+          return false;
+
+        return true;
+      },
+
+      methods: {
+        transaction: function(fn) {
+          if (!this.db_created) {
+            var sql = C.sql.create;
+
+            this.db.transaction(function(t) {
+              // create table
+              t.executeSql(sql, [], function() {
+                this.db_created = true;
+              });
+            }, empty); // trap exception
+          } 
+
+          this.db.transaction(fn);
+        },
+
+        init: function() {
+          var desc, size; 
+          
+          // init description and size
+          desc = this.o.description || "Persistent storage for " + this.name;
+          size = this.o.size || B.whatwg_db.size;
+
+          // create database handle
+          this.db = openDatabase(this.name, C.sql.version, desc, size);
+        },
+
+        get: function(key, fn, scope) {
+          var sql = C.sql.get;
 
           // if callback isn't defined, then return
           if (!fn)
@@ -129,9 +304,8 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
         },
 
         set: function(key, val, fn, scope) {
-          var rm_sql = B.db.sql.remove,
-              sql    = B.db.sql.set;
-          scope = scope || this;
+          var rm_sql = C.sql.remove,
+              sql    = C.sql.set;
 
           // begin set transaction
           this.transaction(function(t) {
@@ -141,7 +315,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
               t.executeSql(sql, [key, val], function(t, r) {
                 // run callback
                 if (fn)
-                  fn.call(scope, true, val);
+                  fn.call(scope || this, true, val);
               });
             });
           });
@@ -151,8 +325,8 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
 
         // begin remove transaction
         remove: function(key, fn, scope) {
-          var get_sql = this.sql.get;
-              sql = this.sql.remove;
+          var get_sql = C.sql.get;
+              sql = C.sql.remove;
 
           this.transaction(function(t) {
             // if a callback was defined, then get the old
@@ -167,11 +341,11 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
                   // exec remove query
                   t.executeSql(sql, [key], function(t, r) {
                     // exec callback
-                    fn.call(scope, true, val);
+                    fn.call(scope || this, true, val);
                   });
                 } else {
                   // key does not exist, exec callback
-                  fn.call(scope, false, null);
+                  fn.call(scope || this, false, null);
                 }
               });
             } else {
@@ -186,11 +360,12 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
       }
     }, 
     
-    // dom backend (globalStorage, FF2+, IE8+)
+    // globalstorage backend (globalStorage, FF2+, IE8+)
     // (src: http://developer.mozilla.org/en/docs/DOM:Storage#globalStorage)
+    //
     // TODO: test to see if IE8 uses object literal semantics or
     // getItem/setItem/removeItem semantics
-    dom: {
+    globalstorage: {
       // (5 meg limit, src: http://ejohn.org/blog/dom-storage-answers/)
       size: 5 * 1024 * 1024,
 
@@ -216,7 +391,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
         },
 
         set: function(key, val, fn, scope) {
-          // expand key and get scope
+          // expand key
           key = this.key(key);
 
           // set value
@@ -237,6 +412,62 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
 
           // delete value
           delete this.store[key];
+
+          if (fn)
+            fn.call(scope || this, (val !== null), val);
+        } 
+      }
+    }, 
+    
+    // localstorage backend (globalStorage, FF2+, IE8+)
+    // (src: http://www.whatwg.org/specs/web-apps/current-work/#the-localstorage)
+    localstorage: {
+      // (unknown?)
+      size: -1,
+
+      test: function() {
+        return window.localStorage ? true : false;
+      },
+
+      methods: {
+        key: function(key) {
+          return esc(this.name) + esc(key);
+        },
+
+        init: function() {
+          this.store = localStorage;
+        },
+
+        get: function(key, fn, scope) {
+          // expand key
+          key = this.key(key);
+
+          if (fn)
+            fn.call(scope || this, true, this.store.getItem(key));
+        },
+
+        set: function(key, val, fn, scope) {
+          // expand key
+          key = this.key(key);
+
+          // set value
+          this.store.setItem(key, val);
+
+          if (fn)
+            fn.call(scope || this, true, val);
+        },
+
+        remove: function(key, fn, scope) {
+          var val;
+
+          // expand key
+          key = this.key(key);
+
+          // get value
+          val = this.getItem(key);
+
+          // delete value
+          this.store.removeItem(key);
 
           if (fn)
             fn.call(scope || this, (val !== null), val);
@@ -389,7 +620,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
 
   // init function
   var init = function() {
-    var i, l, b, key, fns = B.methods, keys = B.search_order;
+    var i, l, b, key, fns = C.methods, keys = C.search_order;
 
     // set all functions to the empty function
     for (i = 0, l = fns.length; i < l; i++) 
@@ -397,7 +628,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
 
     // clear type and size
     P.type = null;
-    P.size = 0;
+    P.size = -1;
 
     // loop over all backends and test for each one
     for (i = 0, l = keys.length; !P.type && i < l; i++) {
@@ -436,19 +667,19 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
       B[o.id] = o;
 
       // add backend to front of search order
-      B.search_order = [o.id].concat(B.search_order);
+      C.search_order = [o.id].concat(C.search_order);
 
       // re-initialize library
       init();
     },
 
     remove: function(id) {
-      var ofs = B.search_order.indexOf(id);
+      var ofs = C.search_order.indexOf(id);
       if (ofs < 0)
         return;
 
       // remove from search order
-      B.search_order.splice(ofs, 1);
+      C.search_order.splice(ofs, 1);
 
       // delete from lut
       delete B[id];
