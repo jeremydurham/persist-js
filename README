@@ -1,0 +1,129 @@
+PersistJS 0.1.0 README
+======================
+
+PersistJS is a JavaScript client-side persistent storage library.
+PersistJS features:
+
+  * Small (8k minified, 2.5k gzipped)
+  * Stand-Alone: No dependencies on other JavaScript libraries or Flash
+  * Consistent: Provides a consistent, opaque API.
+  * Extensible: Custom backends can be added easily.
+  * Backwards Compatible: Can fall back to cookies if no client-side
+    storage solution for the given browser is available.
+  * Forwards Compatible: Supports the upcoming versions of Internet
+    Explorer, Firefox, and Safari.
+  * Unobtrusive: Capability testing rather than browser detection, which
+    means newer standards-conformant browsers will automatically be
+    supported.
+
+Currently the only reliable cross-platform mechanism for storing data
+on the client side are cookies.  Unfortunately, using cookies as a
+persistent data store has a couple of problems:
+
+  * Size: Cookies are limited to about 4 kilobytes in size.
+  * Bandwidth: Cookies are sent along with every HTTP transaction.
+  * Complexity: Cookies are difficult to manipulate correctly.
+
+Modern web browsers have addressed these issues by include several
+different mechanisms for saving persistent data on the client side.
+Unfortunately, each browser has addressed the problem in a different and
+incompatible way.  There are currently 4 different client side
+persistent data solutions:
+
+  * globalStorage: Firefox 2.0+, Internet Explorer 8
+  * localStorage: development WebKit
+  * openDatabase: Safari 3.1+
+  * userdata behavior: Internet Explorer 5.5+
+
+Some developers have attempted to address this deficiency with browser
+plugins:
+
+  * Adobe Flash
+  * Google Gears
+
+That means there are no less than 6 incompatible solutions for storing
+persistent data on the client.  
+
+The most notable attempt at addressing this problem is probably Dojo
+Storage.  Unfortunately, Dojo Storage does not support Internet Explorer
+without Flash, and it does not support Safari or other WebKit-based
+browsers at all.  Also, Dojo Storage is a part of Dojo, which means that
+it is not a standalone library; it depends on several other Dojo
+components in order to operate.
+
+PersistJS addresses each of these issues.  It currently supports the
+following backends:
+
+   * gears:         Google Gears-based persistent storage.
+   * localstorage:  HTML5 draft storage.
+   * whatwg_db:     HTML5 draft database storage.
+   * globalstorage: HTML5 draft storage (old spec).
+   * ie:            Internet Explorer userdata behaviors.
+   * cookie:        Cookie-based persistent storage.
+
+Each backend provides the exact same interface.  In fact, you don't have
+to know or care which backend is being used.  The next section explains
+how to use the PersistJS API.
+
+Using PersistJS
+===============
+Using PersistJS is fairly straightforward.  First, you create a
+persistent store object:
+
+    // create new store named "My Application"
+    var store = new Persist.Store('My Application');
+
+You can have more than one store, as long as they each have a unique
+name.  Store names should begin with a letter, and can consist of upper
+and lower case letters, numbers, spaces, and dashes.  
+
+Next, you assign a value to the store:
+
+    // save data in store
+    store.set('some_key', 'this is a bunch of persistent data');
+
+Later, you read the value back from the store:
+
+    // get value from store and prompt user
+    store.get('some_key', function(ok, val) {
+      if (ok)
+        alert('some_key = ' + val);
+    });
+
+What's up with the anonymous function?  It turns out that some backends
+-- specifically the WHATWG Database (used for Safari 3.1) -- only
+function asynchronously, so using a callback function is the only
+reliable means of ensuring the correct order of operations.  Both
+`set()` and `remove()` accept callback functions as well.  Here's an
+example of removing a key, then performing an operation afterwards:
+
+    // remove key from store and prompt user
+    store.remove('some_key', function(ok, val) {
+      // prompt user
+      alert('some_key was removed');
+    });
+
+If you're in a hurry, then you can stop reading right now, because
+that's all you need to know!
+
+Still here?  Okay, here are some additional details.  When you create a
+new store, you can also pass a hash of optional parameters, like so:
+
+    // create a new deferred data store with a description
+    var store = new Persist.Store('My Data Store', {
+      about: 'This is my data store.',
+      defer: true
+    });
+
+These parameters allow you to pass additional information or fine-tune
+the behavior of the data store.  Here's a complete list of the available
+parameters:
+
+  * about: Description of this data store (used by `what_wg`).
+  * defer: Defer saving until `save()` is called (used by `ie`).
+  * domain: Limit store to given domain or sub-domain (used by `cookie`
+    and `globalstore`).
+  * expires: Number of days before store expires (used by `cookie`).
+  * path: Limit store to given path (used by `cookie`).
+
+
