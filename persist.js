@@ -189,6 +189,9 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
     // TODO: test to see if IE8 uses object literal semantics or
     // getItem/setItem/removeItem semantics
     dom: {
+      // (5 meg limit, src: http://ejohn.org/blog/dom-storage-answers/)
+      size: 5 * 1024 * 1024,
+
       test: function() {
         return window.globalStorage ? true : false;
       },
@@ -240,6 +243,9 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
       prefix:   '_persist_data-',
       test_id:  '_persist_data_test',
       style:    'display:none; behavior:url(#default#userdata);',
+
+      // 64k limit
+      size:     64 * 1024,
 
       test: function() {
         // make sure we're dealing with IE
@@ -321,6 +327,9 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
     cookie: {
       delim: ':',
 
+      // 4k limit
+      size: 4096,
+
       test: function() {
         // XXX: use easycookie to test if cookies are enabled
         return P.Cookie.enabled ? true : false;
@@ -380,8 +389,9 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
     for (i = 0, l = fns.length; i < l; i++) 
       P.Store.prototype[fns[i]] = empty;
 
-    // clear type
+    // clear type and size
     P.type = null;
+    P.size = 0;
 
     // loop over all backends and test for each one
     for (i = 0, l = keys.length; !P.type && i < l; i++) {
@@ -389,8 +399,9 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
 
       // test for backend
       if (b.test()) {
-        // found backend, save type
+        // found backend, save type and size
         P.type = keys[i];
+        P.size = b.size;
 
         // extend store prototype with backend methods
         for (key in b.methods)
@@ -407,8 +418,9 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
     // version of persist library
     VERSION: VERSION,
 
-    // backend type
+    // backend type and size limit
     type: null,
+    size: 0,
 
     // expose init function
     // init: init,
