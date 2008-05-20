@@ -73,6 +73,9 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
       'cookie'
     ],
 
+    // valid name regular expression
+    name_re: /^[a-z][a-z0-9_ -]+$/i,
+
     // list of backend methods
     methods: [
       'init', 
@@ -127,12 +130,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
         },
 
         init: function() {
-          var desc, size; 
-          
-          // init description and size
-          desc = this.o.description || "Persistent storage for " + this.name;
-
-          // create database handle
+          // create database handle (TODO: add schema version?)
           this.db = google.gears.factory.create('beta.database');
 
           // open database
@@ -241,7 +239,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
 
       test: function() {
         var name = 'PersistJS Test', 
-            desc = 'Persistent database test.',
+            desc = 'Persistent database test.';
 
         // test for openDatabase
         if (!window.openDatabase)
@@ -275,7 +273,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
           var desc, size; 
           
           // init description and size
-          desc = this.o.description || "Persistent storage for " + this.name;
+          desc = this.o.about || "Persistent storage for " + this.name;
           size = this.o.size || B.whatwg_db.size;
 
           // create database handle
@@ -693,6 +691,10 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
 
     // store API
     Store: function(name, o) {
+      // verify name
+      if (!C.name_re.exec(name))
+        throw new Error("Invalid name");
+
       // XXX: should we lazy-load type?
       // if (!P._init)
       //   init();
@@ -703,8 +705,9 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
       o = o || {};
       this.name = name;
 
-      // XXx: does this work?
-      o.domain = o.domain || location.hostname || 'localdomain';
+      // get domain
+      o.domain = o.domain || location.hostname || 'localhost.localdomain';
+
       this.o = o;
 
       // expires in 2 years
