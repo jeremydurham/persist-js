@@ -562,8 +562,9 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
     cookie: {
       delim: ':',
 
-      // 4k limit
-      size: 4096,
+      // 4k limit (low-ball this limit to handle browser weirdness, and 
+      // so we don't hose session cookies)
+      size: 4000,
 
       test: function() {
         // XXX: use easycookie to test if cookies are enabled
@@ -705,7 +706,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
       o = o || {};
       this.name = name;
 
-      // get domain
+      // get domain (XXX: does this localdomain fix work?)
       o.domain = o.domain || location.hostname || 'localhost.localdomain';
 
       this.o = o;

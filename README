@@ -1,8 +1,21 @@
 PersistJS 0.1.0 README
 ======================
 
+Table of Contents
+-----------------
+  1. Introduction
+  2. Rationale
+  3. Using PersistJS
+  4. Size Limits
+  5. Other Limits
+  6. Extending PersistJS
+  7. API Reference
+  8. About the Author
+
+1. Introduction
+---------------
 PersistJS is a JavaScript client-side persistent storage library.
-PersistJS features:
+PersistJS features include:
 
   * Small (8k minified, 2.5k gzipped)
   * Stand-Alone: No dependencies on other JavaScript libraries or Flash
@@ -15,6 +28,15 @@ PersistJS features:
   * Unobtrusive: Capability testing rather than browser detection, which
     means newer standards-conformant browsers will automatically be
     supported.
+
+The latest version of PersistJS is always available online at the
+following URL:
+
+    http://pablotron.org/software/persist-js/
+
+2. Rationale
+------------
+Why use PersistJS?  What's the problem with cookies or Flash?
 
 Currently the only reliable cross-platform mechanism for storing data
 on the client side are cookies.  Unfortunately, using cookies as a
@@ -41,6 +63,17 @@ plugins:
   * Adobe Flash
   * Google Gears
 
+The problem with relying on Flash and Gears are the same as any other
+browser plugin; users without the plugin are stuck, and your application
+is tied to software from a particular vendor.  Flash has additional
+problems as well:
+
+  * Many users block Flash or require a click in order to enable
+    flash content; this makes Flash unsuitable as a transparent,
+    client-side data store.
+  * Flash is notoriously unreliable on newer 64-bit machines.
+  * Some businesses block Flash content as a security measure.
+
 That means there are no less than 6 incompatible solutions for storing
 persistent data on the client.  
 
@@ -65,8 +98,8 @@ Each backend provides the exact same interface.  In fact, you don't have
 to know or care which backend is being used.  The next section explains
 how to use the PersistJS API.
 
-Using PersistJS
-===============
+3. Using PersistJS
+------------------
 Using PersistJS is fairly straightforward.  First, you create a
 persistent store object:
 
@@ -119,11 +152,96 @@ These parameters allow you to pass additional information or fine-tune
 the behavior of the data store.  Here's a complete list of the available
 parameters:
 
-  * about: Description of this data store (used by `what_wg`).
+  * about: Description of this data store (used by `whatwg_db`).
   * defer: Defer saving until `save()` is called (used by `ie`).
   * domain: Limit store to given domain or sub-domain (used by `cookie`
     and `globalstore`).
   * expires: Number of days before store expires (used by `cookie`).
   * path: Limit store to given path (used by `cookie`).
+  * size: Estimated size of data set (used by `whatwg_db`).
 
+Notes: The `defer` option exists because there is no way to load and
+save individual keys in the `ie` backend.  By default, the `ie` backend
+will load all data when getting a value, and save all data when setting
+a value.  When the `defer` flag is set, the store data will only be
+loaded when the store is created or when the `load()` method is called.  
 
+More importantly, data will _not_ be saved unless the `save()` method is
+called.  If you choose to use the `defer` flag, the easiest way to make
+sure `save()` is called is to use an unload handler, like so:
+
+    <body unload='save_data();'>
+
+And the javascript:
+
+    function save_data() {
+      // save store data
+      store.save();
+    }
+
+It's probably best not to use this feature unless you really need it.
+
+4. Size Limits
+--------------
+Each backend has a different data size limit.  While you generally
+aren't concerned about _which_ backend is being used, you may care about
+the amount of data you are able to store.  
+
+To deal with this, the attribute `Persist.size` is set to the
+_approximate_ size limit, in bytes, of the active backend.  For backends
+where the size limit is unlimited or unknown, `Persist.size` is set to
+`-1`.  Here's a rough breakdown of the size limits for each backend:
+
+  * cookie:         4 kilobytes
+  * gears:          unknown
+  * globalstorage:  5 megabytes
+  * ie:             64 kilobytes
+  * localstorage:   unknown 
+  * whatwg_db:      unknown, although you can request a size with the
+                    `size` attribute; defaults to 200 kilobytes
+
+(Note that the key length is also included in the data size limit).
+
+Rather than testing for a specific backend, it is probably better to
+calculate the approximate size of the data that you need to save, and
+then prompt the user if there is insufficient space.  For example:
+
+    var lots_of_data = '...'; // value with lots of data
+
+    try {
+      // check size of data
+      if (Persist.size != -1 && Persist.size < lots_of_data.length)
+        throw new Error('too much data');
+
+      // try and save data
+      store.set('some_key', lots_of_data);
+    } catch (err) {
+      // display save error
+      alert("Couldn't save data: " + err);
+    }
+
+5. Other Limits
+---------------
+The `cookie` backend is limited by the number of maximum number of
+cookies that can be saved by the browser.  Older browsers typically
+limited the number of cookies to 20 per domain, although newer browsers
+have increased this limit to 50 cookies per domain.  
+
+You can work around this limit by serializing your data as JSON or
+some other format.
+
+The `cookie` backend is the only backend with any practical limit on the
+number of keys.
+
+6. Extending PersistJS
+----------------------
+TODO...
+
+7. API Reference
+----------------
+TODO...
+
+8. About the Author
+-------------------
+Paul Duncan (pabs@pablotron.org)
+http://pablotron.org/
