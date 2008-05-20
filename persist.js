@@ -239,17 +239,8 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
 
       test: function() {
         // make sure we're dealing with IE
-        if (!document.attachEvent)
-          return false;
-
-/* 
- *         // create test userdata element
- *         var el = B.ie.make_userdata(B.ie.test_id);
- * 
- *         // test to see if the load method is defined
- *         return (el.load ? true : false);
- */ 
-        return true;
+        // (src: http://javariet.dk/shared/browser_dom.htm)
+        return window.ActiveXObject ? true : false;
       },
 
       make_userdata: function(id) {
@@ -449,8 +440,10 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
 
     // store API
     Store: function(name, o) {
-      if (!P._init)
-        init();
+      // XXX: should we lazy-load type?
+      // if (!P._init)
+      //   init();
+
       if (!P.type)
         throw new Error("No suitable storage found");
 
@@ -469,6 +462,9 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
     } 
   };
 
-  // init perssist and return top-level namespace
+  // init persist
+  init();
+
+  // return top-level namespace
   return P;
 })();
