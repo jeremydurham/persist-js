@@ -36,7 +36,9 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
      * result in a browser choosing a less capable backend.
      */ 
     search_order: [
-      // TODO: flash, gears, whatwg localStorage
+      // TODO: flash, gears, air, whatwg localStorage (webkit)
+      // 'localstorage',
+      'gears',
       'db', 
       'dom', 
       'ie', 
@@ -201,39 +203,43 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
           return esc(this.name) + esc(key);
         },
 
+        init: function() {
+          this.store = globalStorage[this.o.domain];
+        },
+
         get: function(key, fn, scope) {
-          // expand key and get scope
+          // expand key
           key = this.key(key);
-          scope = scope || this;
 
           if (fn)
-            fn.call(scope, true, globalStorage[this.o.domain][key]);
+            fn.call(scope || this, true, this.store[key]);
         },
 
         set: function(key, val, fn, scope) {
           // expand key and get scope
           key = this.key(key);
-          scope = scope || this;
 
-          globalStorage[this.o.domain][key] = val;
+          // set value
+          this.store[key] = val;
 
           if (fn)
-            fn.call(scope, true, val);
+            fn.call(scope || this, true, val);
         },
 
         remove: function(key, fn, scope) {
           var val;
 
-          // expand key and get scope
+          // expand key
           key = this.key(key);
-          scope = scope || this;
 
-          // get old value
-          val = globalStorage[this.o.domain][key];
-          delete globalStorage[this.o.domain][key];
+          // get value
+          val = this.store[key];
+
+          // delete value
+          delete this.store[key];
 
           if (fn)
-            fn.call(scope, (val !== null), val);
+            fn.call(scope || this, (val !== null), val);
         } 
       }
     }, 
