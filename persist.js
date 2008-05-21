@@ -491,14 +491,13 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
       make_userdata: function(id) {
         var el = document.createElement('div');
 
-        // set element attributes
-        el.setAttribute('id', id);
-        el.setAttribute('className', 'userData');
+        // set element properties
+        el.id = id;
+        el.style.display = 'none';
+        el.addBehavior('#default#userData');
 
         // append element to body
         document.body.appendChild(el);
-
-        el.style.setAttribute('cssText', B.ie.style);
 
         // return element
         return el;
