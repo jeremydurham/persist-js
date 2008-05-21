@@ -1,9 +1,8 @@
-[ ] better IE test (right now i'm just looking for attachEvent)
+[x] better IE test (right now i'm just looking for attachEvent)
   see http://javariet.dk/shared/browser_dom.htm
-
+[x] gears
 [ ] test to make sure userdata is enabled?
 [ ] test for IE8 support (they seem to use getItem, setItem, and removeItem)
 [ ] some form of opera support
-[ ] gears
 [ ] flash
 [ ] air?

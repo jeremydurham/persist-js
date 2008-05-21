@@ -17,7 +17,7 @@ Table of Contents
 PersistJS is a JavaScript client-side persistent storage library.
 PersistJS features include:
 
-  * Small (8k minified, 2.5k gzipped)
+  * Small (8.3k minified, 2.6k gzipped)
   * Stand-Alone: No dependencies on other JavaScript libraries or Flash
   * Consistent: Provides a consistent, opaque API.
   * Extensible: Custom backends can be added easily.
