@@ -250,6 +250,13 @@ then prompt the user if there is insufficient space.  For example:
       alert("Couldn't save data: " + err);
     }
 
+If you absolutely _must_ know which backend is in use, you can do so by
+checking the `Persist.type` value.  Also, if you'd like to disable a
+specific backend, use `Persist.remove()`, like this:
+
+    // disable "cookie" backend (will never be selected)
+    Persist.remove('cookie');
+
 5. Other Limits
 ---------------
 The `cookie` backend is limited by the number of maximum number of
@@ -269,8 +276,21 @@ TODO...
 
 7. API Reference
 ----------------
-TODO...
 
+
+  * Persist.VERSION (String)    Version of PersistJS library.
+  * Persist.type    (String)    Type of data store ('cookie', 'gears',
+                                'globalstorage', 'ie', 'localstorage',
+                                'whatwg_db', or null)
+  * Persist.size    (Integer)   Maximum size, in bytes, of all data, or
+                                -1 for unknown.
+  * Persist.Store   (Function)  Store constructor.
+
+Store Methods:
+
+  * Persist.Store#get - get 
+    * Parameters: 
+      * key           (String)    Name of 
 8. About the Author
 -------------------
 Paul Duncan (pabs@pablotron.org)
