@@ -514,8 +514,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
         },
 
         load: function() {
-          if (this.o.defer)
-            this.el.load(esc(this.name));
+          this.el.load(esc(this.name));
         },
 
         get: function(key, fn, scope) {
@@ -526,7 +525,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
 
           // load data
           if (!this.o.defer)
-            this.el.load(esc(this.name));
+            this.load();
 
           // get value
           val = this.el.getAttribute(key);
@@ -542,9 +541,12 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
           
           // set attribute
           this.el.setAttribute(key, val);
-          if (!this.o.defer)
-            this.el.save(esc(this.name));
 
+          // save data
+          if (!this.o.defer)
+            this.save();
+
+          // call fn
           if (fn)
             fn.call(scope || this, true, val);
         },

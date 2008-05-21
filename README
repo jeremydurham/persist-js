@@ -110,12 +110,42 @@ You can have more than one store, as long as they each have a unique
 name.  Store names should begin with a letter, and can consist of upper
 and lower case letters, numbers, spaces, and dashes.  
 
-Next, you assign a value to the store:
+Also, you shouldn't create a persistent store until after the DOM has
+loaded.  The easiest browser-agnostic way to do this is to set an
+`onload` handler on the `body` element, like this:
+
+    <body onload='load_data();'>
+
+And the JavaScript:
+
+    // global object
+    var store;
+
+    function load_data() {
+      // load persistent store after the DOM has loaded
+      store = new Persist.Store('My Application');
+    }
+
+Many JavaScript libraries such as jQuery, YUI, or Prototype have their
+own way of adding DOM ready handlers.  Here's how you do it in jQuery:
+
+    $(function() {
+      // load persistent store after the DOM has loaded
+      store = new Persist.Store('My Application');
+    });
+
+After you have created a persistent store, you save values to the
+it:
 
     // save data in store
     store.set('some_key', 'this is a bunch of persistent data');
 
-Later, you read the value back from the store:
+Note that these values must be strings.  If you want to save structured
+data like arrays or hashes, you should serialize it using Array.join or
+JSON.
+
+Once you have saved a value to the store, you can read it back, 
+like this:
 
     // get value from store and prompt user
     store.get('some_key', function(ok, val) {
@@ -172,7 +202,7 @@ sure `save()` is called is to use an unload handler, like so:
 
     <body unload='save_data();'>
 
-And the javascript:
+And the JavaScript:
 
     function save_data() {
       // save store data
