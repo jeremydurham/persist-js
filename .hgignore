@@ -1,3 +1,2 @@
-syntax = glob
-.*.sq?
-
+syntax: glob
+.*.sw?
