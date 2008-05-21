@@ -148,18 +148,18 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
           db.open(esc(this.name));
 
           // create table
-          db.execute(C.sql.create);
+          db.execute(C.sql.create).close();
 
           // add transaction handler
           db.transaction = function(fn) {
             // begin transaction
-            db.execute('BEGIN');
+            db.execute('BEGIN').close();
 
             // call callback fn
             fn.call(this, db);
 
             // commit changes
-            db.execute('COMMIT');
+            db.execute('COMMIT').close();
           };
         },
 
@@ -180,6 +180,9 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
               fn.call(scope || this, true, r.field(0));
             else
               fn.call(scope || this, false, null);
+
+            // close result set
+            r.close();
           });
         },
 
@@ -190,10 +193,10 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
           // begin set transaction
           this.transaction(function(t) {
             // exec remove query
-            r = t.execute(rm_sql, [key]);
+            t.execute(rm_sql, [key]).close();
 
             // exec set query
-            t.execute(sql, [key, val]);
+            t.execute(sql, [key, val]).close();
             
             // run callback
             if (fn)
@@ -219,7 +222,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
                 val = r.field(0);
 
                 // exec remove query
-                t.execute(sql, [key]);
+                t.execute(sql, [key]).close();
 
                 // exec callback
                 fn.call(scope || this, true, val);
@@ -227,12 +230,15 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
                 // key does not exist, exec callback
                 fn.call(scope || this, false, null);
               }
+
+              // close result set
+              r.close();
             } else {
               // no callback was defined, so just remove the
               // data without checking the old value
 
               // exec remove query
-              t.execute(sql, [key]);
+              t.execute(sql, [key]).close();
             }
           });
         } 
