@@ -141,7 +141,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
           // excluding the following characters:
           //
           //   / \ : * ? " < > | ; ,
-          db.open(desc);
+          this.db.open(desc);
 
           // add transaction handler
           this.db.transaction = function(fn) {
