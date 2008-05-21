@@ -493,7 +493,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
 
         // set element attributes
         el.setAttribute('id', id);
-        // el.setAttribute('className', 'userData');
+        el.setAttribute('className', 'userData');
 
         // append element to body
         document.body.appendChild(el);
