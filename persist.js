@@ -651,7 +651,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
     flash: {
       test: function() {
         // TODO: better flash detection
-        return (SWFObject) ? true : false;
+        return (window.SWFObject) ? true : false;
       },
 
       methods: {
@@ -666,6 +666,9 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
             // FIXME: hide flash element
             // el.style.display = 'none';
 
+            // append element to body
+            document.body.appendChild(el);
+
             // create new swf object
             o = new SWFObject(this.o.swf_path || cfg.path, cfg.id, cfg.size.w, cfg.size.h, '8');
 
@@ -674,7 +677,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
               o.addVariable(key, cfg.args[key]);
 
             // write flash object
-            o.write(el.id);
+            o.write(el);
 
             // save flash element
             B.flash.el = el;
