@@ -7,10 +7,25 @@
 
   <body onload='Test.init();'>
     <h1>PersistJS Test Page</h1>
-    <label for='data'>Data:</label>
-    <input type='text' id='data'/><br/>
-    <button id='load-btn'>Load</button>
-    <button id='save-btn'>Save</button>
+
+    <fieldset>
+      <legend>Store 1</legend>
+
+      <label for='data'>Data:</label>
+      <input type='text' id='data'/><br/>
+      <button id='load-btn'>Load</button>
+      <button id='save-btn'>Save</button>
+    </fieldset>
+
+    <fieldset>
+      <legend>Store 2</legend>
+
+      <label for='data2'>Data:</label>
+      <input type='text' id='data2'/><br/>
+      <button id='load2-btn'>Load</button>
+      <button id='save2-btn'>Save</button>
+    </fieldset>
+
     <p>
       Persist Type: <span id='type'>none</span>
     </p>
