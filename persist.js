@@ -121,7 +121,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
             // create table
             try {
               this.db.transaction(function(t) {
-                t.execute(sql, []);
+                t.execute(sql);
               });
             } catch (err) { } // trap exception
           } 
