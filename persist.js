@@ -63,8 +63,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
      * result in a browser choosing a less capable backend.
      */ 
     search_order: [
-      // TODO: flash, gears, air, whatwg localStorage (webkit)
-      // 'localstorage',
+      // TODO: air
       'gears',
       'localstorage',
       'whatwg_db', 
@@ -653,7 +652,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
       test: function() {
         // TODO: better flash detection
         return (SWFObject) ? true : false;
-      }
+      },
 
       methods: {
         init: function() {
