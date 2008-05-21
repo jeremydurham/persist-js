@@ -476,8 +476,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
     // IE backend
     ie: {
       prefix:   '_persist_data-',
-      test_id:  '_persist_data_test',
-      style:    'display:none; behavior:url(#default#userdata);',
+      // style:    'display:none; behavior:url(#default#userdata);',
 
       // 64k limit
       size:     64 * 1024,
@@ -492,8 +491,8 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
         var el = document.createElement('div');
 
         // set element properties
-        el.setAttribute('id', id);
-        el.style.setAttribute('display', 'none');
+        el.id = id;
+        el.style.display = 'none';
         el.addBehavior('#default#userData');
 
         // append element to body
