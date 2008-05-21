@@ -69,6 +69,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
       'localstorage',
       'whatwg_db', 
       'globalstorage', 
+      'flash',
       'ie', 
       'cookie'
     ],
@@ -95,6 +96,24 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
       get:      "SELECT v FROM persist_data WHERE k = ?",
       set:      "INSERT INTO persist_data(k, v) VALUES (?, ?)",
       remove:   "DELETE FROM persist_data WHERE k = ?" 
+    },
+
+    // default flash configuration
+    flash: {
+      // ID of wrapper element
+      div_id:   '_persist_flash_wrap',
+
+      // id of flash object/embed
+      id:       '_persist_flash',
+
+      // default path to flash object
+      path: 'persist.swf',
+      size: [1, 1],
+
+      // arguments passed to flash object
+      args: {
+        autostart: true
+      }
     } 
   };
 
@@ -626,6 +645,87 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
           if (fn)
             fn.call(scope || this, val != null, val);
         } 
+      }
+    },
+
+    // flash backend (requires flash 8 or newer)
+    flash: {
+      test: function() {
+        // TODO: better flash detection
+        return (SWFObject) ? true : false;
+      }
+
+      methods: {
+        init: function() {
+          if (!B.flash.el) {
+            var o, key, el, cfg = C.flash;
+
+            // create wrapper element
+            el = document.createElement('div');
+            el.id = cfg.div_id;
+
+            // FIXME: hide flash element
+            // el.style.display = 'none';
+
+            // create new swf object
+            o = new SWFObject(path || cfg.path, cfg.id, cfg.w, cfg.h, '8');
+
+            // set parameters
+            for (key in cfg.args)
+              o.addVariable(key, cfg.args[key]);
+
+            // write flash object
+            o.write(el.id);
+
+            // save flash element
+            B.flash.el = el;
+          }
+
+          // use singleton flash element
+          this.el = B.flash.el;
+        },
+
+        get: function(key, fn, scope) {
+          var val;
+
+          // escape key
+          key = esc(key);
+
+          // get value
+          val = this.el.get(this.name, key);
+
+          // call handler
+          if (fn)
+            fn.call(scope || this, val !== null, val);
+        },
+
+        set: function(key, val, fn, scope) {
+          var old_val;
+
+          // escape key
+          key = esc(key);
+
+          // set value
+          old_val = this.el.set(this.name, key, val);
+
+          // call handler
+          if (fn)
+            fn.call(scope || this, true, val);
+        },
+
+        remove: function(key, fn, scope) {
+          var val;
+
+          // get key
+          key = esc(key);
+
+          // remove old value
+          val = this.el.remove(this.name, key);
+
+          // call handler
+          if (fn)
+            fn.call(scope || this, true, val);
+        }
       }
     }
   };
