@@ -385,7 +385,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
           key = this.key(key);
 
           if (fn)
-            fn.call(scope || this, true, this.store[key]);
+            fn.call(scope || this, true, this.store.getItem(key));
         },
 
         set: function(key, val, fn, scope) {
@@ -393,7 +393,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
           key = this.key(key);
 
           // set value
-          this.store[key] = val;
+          this.store.setItem(key, val);
 
           if (fn)
             fn.call(scope || this, true, val);
@@ -409,7 +409,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
           val = this.store[key];
 
           // delete value
-          delete this.store[key];
+          this.store.removeItem(key);
 
           if (fn)
             fn.call(scope || this, (val !== null), val);
