@@ -30,8 +30,12 @@ Test = {
 
   init: function() {
     // create new persistent store
-    Test.store = new Persist.Store('test');
-    Test.store2 = new Persist.Store('test2');
+    Test.store = new Persist.Store('test', {
+      swf_path: '../persist.swf'
+    });
+    Test.store2 = new Persist.Store('test2', {
+      swf_path: '../persist.swf'
+    });
 
     Test.get('type').innerHTML = Persist.type;
 
