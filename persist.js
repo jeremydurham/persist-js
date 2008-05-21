@@ -680,7 +680,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
             o.write(el);
 
             // save flash element
-            B.flash.el = el;
+            B.flash.el = document.getElementById(cfg.id);
           }
 
           // use singleton flash element
