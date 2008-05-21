@@ -667,7 +667,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
             // el.style.display = 'none';
 
             // create new swf object
-            o = new SWFObject(path || cfg.path, cfg.id, cfg.w, cfg.h, '8');
+            o = new SWFObject(this.o.swf_path || cfg.path, cfg.id, cfg.w, cfg.h, '8');
 
             // set parameters
             for (key in cfg.args)
