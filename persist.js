@@ -113,18 +113,20 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
 
       methods: {
         transaction: function(fn) {
-          if (!this.db_created) {
-            var sql = C.sql.create;
-
-            this.db_created = true;
-
-            // create table
-            try {
-              this.db.transaction(function(t) {
-                t.execute(sql, []);
-              });
-            } catch (err) { } // trap exception
-          } 
+/* 
+ *           if (!this.db_created) {
+ *             var sql = C.sql.create;
+ * 
+ *             this.db_created = true;
+ * 
+ *             // create table
+ *             try {
+ *               this.db.transaction(function(t) {
+ *                 t.execute(sql, []);
+ *               });
+ *             } catch (err) { } // trap exception
+ *           } 
+ */ 
 
           this.db.transaction(fn);
         },
