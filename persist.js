@@ -107,7 +107,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
 
       // default path to flash object
       path: 'persist.swf',
-      size: [1, 1],
+      size: { w:1, h:1 },
 
       // arguments passed to flash object
       args: {
@@ -667,7 +667,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
             // el.style.display = 'none';
 
             // create new swf object
-            o = new SWFObject(this.o.swf_path || cfg.path, cfg.id, cfg.w, cfg.h, '8');
+            o = new SWFObject(this.o.swf_path || cfg.path, cfg.id, cfg.size.w, cfg.size.h, '8');
 
             // set parameters
             for (key in cfg.args)
