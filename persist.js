@@ -505,12 +505,14 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
 
       methods: {
         init: function() {
-          var id = B.ie.prefix + esc(this.name),
-              el = B.ie.make_userdata(id);
+          var id = B.ie.prefix + esc(this.name);
 
-          // save element and load data
-          this.el = el;
-          this.load();
+          // save element
+          this.el = B.ie.make_userdata(id);
+
+          // load data
+          if (this.o.defer)
+            this.load();
         },
 
         load: function() {
