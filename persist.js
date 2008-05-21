@@ -130,8 +130,10 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
         },
 
         init: function() {
+          var db;
+
           // create database handle (TODO: add schema version?)
-          this.db = google.gears.factory.create('beta.database');
+          this.db = db = google.gears.factory.create('beta.database');
 
           // open database
           // from gears ref:
@@ -141,18 +143,18 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
           // excluding the following characters:
           //
           //   / \ : * ? " < > | ; ,
-          this.db.open(esc(this.name));
+          db.open(esc(this.name));
 
           // add transaction handler
-          this.db.transaction = function(fn) {
+          db.transaction = function(fn) {
             // begin transaction
-            this.execute('BEGIN');
+            db.execute('BEGIN');
 
             // call callback fn
-            fn.call(this, this);
+            fn.call(this, db);
 
             // commit changes
-            this.execute('COMMIT');
+            db.execute('COMMIT');
           };
         },
 
