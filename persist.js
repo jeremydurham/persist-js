@@ -515,10 +515,6 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
             this.load();
         },
 
-        load: function() {
-          this.el.load(esc(this.name));
-        },
-
         get: function(key, fn, scope) {
           var val;
 
@@ -534,7 +530,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
 
           // call fn
           if (fn)
-            fn.call(scope || this, true, val);
+            fn.call(scope || this, val ? true : false, val);
         },
 
         set: function(key, val, fn, scope) {
@@ -553,11 +549,12 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
             fn.call(scope || this, true, val);
         },
 
+        load: function() {
+          this.el.load(esc(this.name));
+        },
+
         save: function() {
-          if (this.o.defer) {
-            // flush changes
-            this.el.save(esc(this.name));
-          }
+          this.el.save(esc(this.name));
         }
       }
     },
