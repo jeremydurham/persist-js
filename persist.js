@@ -477,7 +477,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
     ie: {
       prefix:   '_persist_data-',
       test_id:  '_persist_data_test',
-      style:    'display:none; behavior:url(#default#userdata)',
+      style:    'display:none; behavior:url(#default#userdata);',
 
       // 64k limit
       size:     64 * 1024,
@@ -493,11 +493,12 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
 
         // set element attributes
         el.setAttribute('id', id);
-        el.setAttribute('className', 'userdata');
-        el.style.setAttribute('cssText', B.ie.style);
+        // el.setAttribute('className', 'userData');
 
         // append element to body
         document.body.appendChild(el);
+
+        el.style.setAttribute('cssText', B.ie.style);
 
         // return element
         return el;
