@@ -64,11 +64,11 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
      */ 
     search_order: [
       // TODO: air
+      'flash',
       'gears',
       'localstorage',
       'whatwg_db', 
       'globalstorage', 
-      'flash',
       'ie', 
       'cookie'
     ],
