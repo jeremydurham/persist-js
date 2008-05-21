@@ -91,7 +91,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
     sql: {
       version:  '1', // db schema version
 
-      create:   "CREATE TABLE persist_data (k TEXT UNIQUE NOT NULL, v TEXT NOT NULL)",
+      create:   "CREATE TABLE IF NOT EXISTS persist_data (k TEXT UNIQUE NOT NULL, v TEXT NOT NULL)",
       get:      "SELECT v FROM persist_data WHERE k = ?",
       set:      "INSERT INTO persist_data(k, v) VALUES (?, ?)",
       remove:   "DELETE FROM persist_data WHERE k = ?" 
@@ -145,16 +145,19 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
           //   / \ : * ? " < > | ; ,
           db.open(esc(this.name));
 
+          // create table
+          db.execute(C.sql.create);
+
           // add transaction handler
           db.transaction = function(fn) {
             // begin transaction
-            db.execute('BEGIN', []);
+            db.execute('BEGIN');
 
             // call callback fn
             fn.call(this, db);
 
             // commit changes
-            db.execute('COMMIT', []);
+            db.execute('COMMIT');
           };
         },
 
