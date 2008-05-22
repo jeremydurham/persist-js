@@ -132,7 +132,16 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
 
       methods: {
         transaction: function(fn) {
-          this.db.transaction(fn);
+          var db = this.db;
+
+          // begin transaction
+          db.execute('BEGIN').close();
+
+          // call callback fn
+          fn.call(this, db);
+
+          // commit changes
+          db.execute('COMMIT').close();
         },
 
         init: function() {
@@ -153,18 +162,6 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
 
           // create table
           db.execute(C.sql.create).close();
-
-          // add transaction handler
-          db.transaction = function(fn) {
-            // begin transaction
-            db.execute('BEGIN').close();
-
-            // call callback fn
-            fn.call(this, db);
-
-            // commit changes
-            db.execute('COMMIT').close();
-          };
         },
 
         get: function(key, fn, scope) {
