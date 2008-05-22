@@ -17,7 +17,7 @@ Table of Contents
 PersistJS is a JavaScript client-side persistent storage library.
 PersistJS features include:
 
-  * Small (9.2k minified, 2.8k gzipped)
+  * Small (9.3k minified, 3k gzipped)
   * Consistent: Provides a consistent, opaque API.
   * Extensible: Custom backends can be added easily.
   * Backwards Compatible: Can fall back to flash or cookies if no
@@ -46,27 +46,26 @@ persistent data store has a couple of problems:
   * Bandwidth: Cookies are sent along with every HTTP transaction.
   * Complexity: Cookies are difficult to manipulate correctly.
 
-Modern web browsers have addressed these issues by include several
-different mechanisms for saving persistent data on the client side.
-Unfortunately, each browser has addressed the problem in a different and
-incompatible way.  There are currently 4 different client side
-persistent data solutions:
+Modern web browsers have addressed these issues by adding non-Cookie
+mechanisms for saving client-side persistent data.  Unfortunately, each
+browser has addressed the problem in a different and incompatible way.
+There are currently 4 different client side persistent data solutions:
 
   * globalStorage: Firefox 2.0+, Internet Explorer 8
   * localStorage: development WebKit
   * openDatabase: Safari 3.1+
   * userdata behavior: Internet Explorer 5.5+
 
-Some developers have attempted to address this deficiency with browser
-plugins:
+Some developers have attempted to address the client side storage
+issue with browser plugins:
 
   * Adobe Flash
   * Google Gears
 
-The problem with relying on Flash and Gears are the same as any other
-browser plugin; users without the plugin are stuck, and your application
-is tied to software from a particular vendor.  Flash has additional
-problems as well:
+The problem with relying on Flash and/or Gears are the same as any other
+browser plugin; users without the plugin are unsupported, and your
+application is tied to software from a particular vendor.  Flash has
+additional problems as well:
 
   * Many users block Flash or require a click in order to enable
     flash content; this makes Flash unsuitable as a transparent,
@@ -74,18 +73,17 @@ problems as well:
   * Flash is notoriously unreliable on newer 64-bit machines.
   * Some businesses block Flash content as a security measure.
 
-That means there are no less than 6 incompatible solutions for storing
-persistent data on the client.  
+Anyway, if we include Gears and Flash, that means there are no less than
+6 incompatible solutions for storing client-side persistent data.  
 
 The most notable attempt at addressing this problem is probably Dojo
 Storage.  Unfortunately, Dojo Storage does not support Internet Explorer
 without Flash, and it does not support Safari or other WebKit-based
-browsers at all.  Also, Dojo Storage is a part of Dojo, which means that
-it is not a standalone library; it depends on several other Dojo
-components in order to operate.
+browsers at all.  Also, Dojo Storage is not standalone; it requires a
+several other Dojo components in order to operate.
 
-PersistJS addresses each of these issues.  It currently supports the
-following backends:
+PersistJS addresses each of these issues.  It currently supports
+persistent client-side storage through the following backends:
 
    * flash:         Flash 8 persistent storage.
    * gears:         Google Gears-based persistent storage.
@@ -95,25 +93,33 @@ following backends:
    * ie:            Internet Explorer userdata behaviors.
    * cookie:        Cookie-based persistent storage.
 
-Each backend provides the exact same interface.  In fact, you don't have
-to know or care which backend is being used.  The next section explains
-how to use the PersistJS API.
+Each backend is wrapped by PersistJS and exploses the exact same
+interface, which means you don't have to know or care which backend is
+being used.  The next section explains how to use the PersistJS API.
 
 3. Using PersistJS
 ------------------
-Using PersistJS is fairly straightforward.  First, you create a
-persistent store object:
+Using PersistJS is fairly straightforward.  First, you include
+`persist-min.js` in your web site:
+
+    <head>
+      <title>My Wonderful Page</title>
+      <script type='text/javascript' src='persist-min.js'></script>
+    </head>
+
+After the DOM has loaded, you create a persistent store object:
 
     // create new store named "My Application"
     var store = new Persist.Store('My Application');
 
-You can have more than one store, as long as they each have a unique
+The store constructor has one required parameter: a store name.  You can
+create as many stores as you'd like, as long as they each have a unique
 name.  Store names should begin with a letter, and can consist of upper
 and lower case letters, numbers, spaces, and dashes.  
 
-Also, you shouldn't create a persistent store until after the DOM has
-loaded.  The easiest browser-agnostic way to do this is to set an
-`onload` handler on the `body` element, like this:
+As I mentioned before, you shouldn't create a persistent store until
+after the DOM has loaded.  The easiest browser-agnostic way to do this
+is to set an `onload` handler on the `body` element, like this:
 
     <body onload='load_data();'>
 
@@ -127,8 +133,8 @@ And the JavaScript:
       store = new Persist.Store('My Application');
     }
 
-Many JavaScript libraries such as jQuery, YUI, or Prototype have their
-own way of adding DOM ready handlers.  Here's how you do it in jQuery:
+Most popular JavaScript libraries such have their own way of adding DOM
+ready handlers.  Here's how you do it in jQuery:
 
     $(function() {
       // load persistent store after the DOM has loaded
@@ -144,13 +150,13 @@ And in YUI:
     // call when the DOM has loaded
     YAHOO.util.Event.onDOMReady(init);
 
-After you have created a persistent store, you save values to the
-it:
+Anyway, after you have created a persistent store, you save values to
+the it:
 
     // save data in store
     store.set('some_key', 'this is a bunch of persistent data');
 
-Note that these values must be strings.  If you want to save structured
+Note that the value must be a string.  If you want to save structured
 data like arrays or hashes, you should serialize it using Array.join or
 JSON.
 
@@ -198,7 +204,7 @@ parameters:
   * domain:   Limit store to given domain or sub-domain (used by `cookie`
               and `globalstore`).
   * expires:  Number of days before store expires (used by `cookie`).  
-              Defaults to 365 days.
+              Defaults to 2 years (730 days).
   * path:     Limit store to given path (used by `cookie`).
   * size:     Estimated size of data set (used by `whatwg_db`).
   * swf_path: Path to file `persist.swf` (used by `flash`).  Defaults to
@@ -225,7 +231,22 @@ And the JavaScript:
 
 It's probably best not to use this feature unless you really need it.
 
-As for the 
+One final note about the Flash and Gears backends: They will be disabled
+unless you include swfobject.js and gears_init.js, respectively.  These
+files are available in the extras/ directory.
+
+If you'd rather include all of these in one combined file (to enable and
+check for all possible backends), you can use the file
+`extras/persist-all-min.js` in place of `persist-min.js`.
+`persist-all-min.js` is the the following files concatenated together
+and minified:
+  
+  * extras/gears_init.js
+  * extras/swfobject.js
+  * persist-min.js
+
+Note that `persist-all-min.js` is roughly 60% larger than
+`persist-min.js`.
 
 4. Size Limits
 --------------
@@ -289,7 +310,15 @@ number of keys.
 
 6. Extending PersistJS
 ----------------------
-TODO...
+PersistJS exposes one method -- `Persist.add()` -- for extending
+PersistJS and adding custom backends.  This method is currently
+undocumented and may change in future versions.
+
+PersistJS also includes a full copy of EasyCookie 0.2.1, which is
+exposed as Persist.Cookie.  For documentation on the EasyCookie API, see 
+the EasyCookie page at:
+
+  http://pablotron.org/software/easy_cookie/
 
 7. API Reference
 ----------------
@@ -301,7 +330,6 @@ TODO...
                                 'whatwg_db', or null)
   * Persist.size    (Integer)   Maximum size, in bytes, of all data, or
                                 -1 for unknown.
-  * Persist.Store   (Function)  Store constructor.
 
 Store Methods:
 
