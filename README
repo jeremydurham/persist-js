@@ -87,6 +87,7 @@ components in order to operate.
 PersistJS addresses each of these issues.  It currently supports the
 following backends:
 
+   * flash:         Flash 8 persistent storage.
    * gears:         Google Gears-based persistent storage.
    * localstorage:  HTML5 draft storage.
    * whatwg_db:     HTML5 draft database storage.
@@ -182,13 +183,17 @@ These parameters allow you to pass additional information or fine-tune
 the behavior of the data store.  Here's a complete list of the available
 parameters:
 
-  * about: Description of this data store (used by `whatwg_db`).
-  * defer: Defer saving until `save()` is called (used by `ie`).
-  * domain: Limit store to given domain or sub-domain (used by `cookie`
-    and `globalstore`).
-  * expires: Number of days before store expires (used by `cookie`).
-  * path: Limit store to given path (used by `cookie`).
-  * size: Estimated size of data set (used by `whatwg_db`).
+  * about:    Description of this data store (used by `whatwg_db`).
+  * defer:    Defer saving until `save()` is called (used by `ie`).  See
+              below for additional details.
+  * domain:   Limit store to given domain or sub-domain (used by `cookie`
+              and `globalstore`).
+  * expires:  Number of days before store expires (used by `cookie`).  
+              Defaults to 365 days.
+  * path:     Limit store to given path (used by `cookie`).
+  * size:     Estimated size of data set (used by `whatwg_db`).
+  * swf_path: Path to file `persist.swf` (used by `flash`).  Defaults to
+              `./persist.swf` if unspecified.
 
 Notes: The `defer` option exists because there is no way to load and
 save individual keys in the `ie` backend.  By default, the `ie` backend
@@ -211,6 +216,8 @@ And the JavaScript:
 
 It's probably best not to use this feature unless you really need it.
 
+As for the 
+
 4. Size Limits
 --------------
 Each backend has a different data size limit.  While you generally
@@ -224,6 +231,7 @@ where the size limit is unlimited or unknown, `Persist.size` is set to
 
   * cookie:         4 kilobytes
   * gears:          unknown
+  * flash:          unknown (at least 100k)
   * globalstorage:  5 megabytes
   * ie:             64 kilobytes
   * localstorage:   unknown 
