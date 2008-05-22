@@ -17,12 +17,11 @@ Table of Contents
 PersistJS is a JavaScript client-side persistent storage library.
 PersistJS features include:
 
-  * Small (8.3k minified, 2.6k gzipped)
-  * Stand-Alone: No dependencies on other JavaScript libraries or Flash
+  * Small (9.2k minified, 2.6k gzipped)
   * Consistent: Provides a consistent, opaque API.
   * Extensible: Custom backends can be added easily.
-  * Backwards Compatible: Can fall back to cookies if no client-side
-    storage solution for the given browser is available.
+  * Backwards Compatible: Can fall back to flash or cookies if no
+    client-side storage solution for the given browser is available.
   * Forwards Compatible: Supports the upcoming versions of Internet
     Explorer, Firefox, and Safari.
   * Unobtrusive: Capability testing rather than browser detection, which
@@ -134,6 +133,15 @@ own way of adding DOM ready handlers.  Here's how you do it in jQuery:
       // load persistent store after the DOM has loaded
       store = new Persist.Store('My Application');
     });
+
+And in YUI:
+
+    function init() {
+      store = new Persist.Store('My Application');
+    }
+
+    // call when the DOM has loaded
+    YAHOO.util.Event.onDOMReady(init);
 
 After you have created a persistent store, you save values to the
 it:

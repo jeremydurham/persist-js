@@ -61,14 +61,15 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
      * listed in order of capacity, and many browsers
      * support multiple backends, so changing the search order could
      * result in a browser choosing a less capable backend.
+     * 
      */ 
     search_order: [
       // TODO: air
-      'flash',
       'gears',
       'localstorage',
       'whatwg_db', 
       'globalstorage', 
+      'flash',
       'ie', 
       'cookie'
     ],
