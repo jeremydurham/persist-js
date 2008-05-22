@@ -640,11 +640,13 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
     flash: {
       test: function() {
         // TODO: better flash detection
-        if (!window.SWFObject)
+        if (!window.SWFObject || !deconcept || !deconcept.SWFObjectUtil)
           return false;
 
         // get the major version
-        var major = deconcept.SWFObjectUtil.getPlayerVersion().major
+        var major = deconcept.SWFObjectUtil.getPlayerVersion().major;
+
+        // check flash version (require 8.0 or newer)
         return (major >= 8) ? true : false;
       },
 
