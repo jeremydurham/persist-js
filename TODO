@@ -2,7 +2,8 @@
   see http://javariet.dk/shared/browser_dom.htm
 [x] gears
 [ ] test to make sure userdata is enabled?
-[ ] test for IE8 support (they seem to use getItem, setItem, and removeItem)
-[ ] some form of opera support
-[ ] flash
+[x] test for IE8 support (they seem to use getItem, setItem, and removeItem)
+[-] some form of opera support
+[x] flash
 [ ] air?
+[ ] clear method
