@@ -132,21 +132,6 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
 
       methods: {
         transaction: function(fn) {
-/* 
- *           if (!this.db_created) {
- *             var sql = C.sql.create;
- * 
- *             this.db_created = true;
- * 
- *             // create table
- *             try {
- *               this.db.transaction(function(t) {
- *                 t.execute(sql, []);
- *               });
- *             } catch (err) { } // trap exception
- *           } 
- */ 
-
           this.db.transaction(fn);
         },
 
@@ -591,6 +576,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
     },
 
     // cookie backend
+    // uses easycookie: http://pablotron.org/software/easy_cookie/
     cookie: {
       delim: ':',
 
@@ -649,10 +635,17 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
     },
 
     // flash backend (requires flash 8 or newer)
+    // http://kb.adobe.com/selfservice/viewContent.do?externalId=tn_16194&sliceId=1
+    // http://livedocs.adobe.com/flash/8/main/wwhelp/wwhimpl/common/html/wwhelp.htm?context=LiveDocs_Parts&file=00002200.html
     flash: {
       test: function() {
         // TODO: better flash detection
-        return (window.SWFObject) ? true : false;
+        if (!window.SWFObject)
+          return false;
+
+        // get the major version
+        var major = deconcept.SWFObjectUtil.getPlayerVersion().major
+        return (major >= 8) ? true : false;
       },
 
       methods: {
