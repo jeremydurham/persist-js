@@ -9,8 +9,7 @@ Table of Contents
   4. Size Limits
   5. Other Limits
   6. Extending PersistJS
-  7. API Reference
-  8. About the Author
+  7. About the Author
 
 1. Introduction
 ---------------
@@ -327,23 +326,7 @@ the EasyCookie page at:
 
   http://pablotron.org/software/easy_cookie/
 
-7. API Reference
-----------------
-
-
-  * Persist.VERSION (String)    Version of PersistJS library.
-  * Persist.type    (String)    Type of data store ('cookie', 'gears',
-                                'globalstorage', 'ie', 'localstorage',
-                                'whatwg_db', or null)
-  * Persist.size    (Integer)   Maximum size, in bytes, of all data, or
-                                -1 for unknown.
-
-Store Methods:
-
-  * Persist.Store#get - get 
-    * Parameters: 
-      * key           (String)    Name of 
-8. About the Author
+7. About the Author
 -------------------
 Paul Duncan (pabs@pablotron.org)
 http://pablotron.org/
