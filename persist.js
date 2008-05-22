@@ -85,7 +85,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
       'remove', 
       'load', 
       'save'
-      // TODO: clear
+      // TODO: clear method?
     ],
 
     // sql for db backends (gears and db)

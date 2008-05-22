@@ -18,15 +18,18 @@ PersistJS is a JavaScript client-side persistent storage library.
 PersistJS features include:
 
   * Small (9.3k minified, 3k gzipped)
-  * Consistent: Provides a consistent, opaque API.
+  * Standalone: Does not need any additional browser plugins or
+    JavaScript libraries to work on the vast majority of current
+    browsers.
+  * Consistent: Provides a consistent, opaque API, regardless of
+    the browser.
   * Extensible: Custom backends can be added easily.
   * Backwards Compatible: Can fall back to flash or cookies if no
     client-side storage solution for the given browser is available.
   * Forwards Compatible: Supports the upcoming versions of Internet
-    Explorer, Firefox, and Safari.
-  * Unobtrusive: Capability testing rather than browser detection, which
-    means newer standards-conformant browsers will automatically be
-    supported.
+    Explorer, Firefox, and Safari (Opera too, if you have Flash).
+  * Unobtrusive: Capability testing rather than browser detection, so
+    newer standards-conformant browsers will automatically be supported.
 
 The latest version of PersistJS is always available online at the
 following URL:
@@ -35,19 +38,21 @@ following URL:
 
 2. Rationale
 ------------
-Why use PersistJS?  What's the problem with straight cookies or
-requiring Flash?
+Why use PersistJS?  What's the problem with using cookies directly or
+simply requiring Flash?
 
-Currently the only reliable cross-platform mechanism for storing data
-on the client side are cookies.  Unfortunately, using cookies as a
-persistent data store has a couple of problems:
+Currently the only reliable cross-platform and cross-browser mechanism
+for storing data on the client side are cookies.  Unfortunately, using
+cookies to store persistent data has several problems:
 
   * Size: Cookies are limited to about 4 kilobytes in size.
   * Bandwidth: Cookies are sent along with every HTTP transaction.
   * Complexity: Cookies are difficult to manipulate correctly.
 
 Modern web browsers have addressed these issues by adding non-Cookie
-mechanisms for saving client-side persistent data.  Unfortunately, each
+mechanisms for saving client-side persistent data.  Each of these
+solutions are simpler to use than cookies, can store far more data, and
+are not transmitted along with HTTP requests.  Unfortunately, each
 browser has addressed the problem in a different and incompatible way.
 There are currently 4 different client side persistent data solutions:
 
@@ -57,15 +62,16 @@ There are currently 4 different client side persistent data solutions:
   * userdata behavior: Internet Explorer 5.5+
 
 Some developers have attempted to address the client side storage
-issue with browser plugins:
+issue with the following browser plugins:
 
   * Adobe Flash
   * Google Gears
 
-The problem with relying on Flash and/or Gears are the same as any other
-browser plugin; users without the plugin are unsupported, and your
-application is tied to software from a particular vendor.  Flash has
-additional problems as well:
+The problem with relying on plugins, of course, is that users without
+the plugin installed miss out on the feature in question, and your
+application is dependent on software from a particular vendor.  Google
+Gears, for example, is not widely deployed.  Flash is, but it has
+problems of its own:
 
   * Many users block Flash or require a click in order to enable
     flash content; this makes Flash unsuitable as a transparent,
@@ -79,10 +85,11 @@ Anyway, if we include Gears and Flash, that means there are no less than
 The most notable attempt at addressing this problem is probably Dojo
 Storage.  Unfortunately, Dojo Storage does not support Internet Explorer
 without Flash, and it does not support Safari or other WebKit-based
-browsers at all.  Also, Dojo Storage is not standalone; it requires a
-several other Dojo components in order to operate.
+browsers at all (at least, not without Flash).  Also, Dojo Storage is
+not standalone; it requires a several other Dojo components in order to
+operate.
 
-PersistJS addresses each of these issues.  It currently supports
+PersistJS addresses all of the issues above.  It currently supports
 persistent client-side storage through the following backends:
 
    * flash:         Flash 8 persistent storage.
