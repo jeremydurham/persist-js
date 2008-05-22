@@ -148,7 +148,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
           var db;
 
           // create database handle (TODO: add schema version?)
-          this.db = db = google.gears.factory.create('beta.database');
+          db = this.db = google.gears.factory.create('beta.database');
 
           // open database
           // from gears ref:
