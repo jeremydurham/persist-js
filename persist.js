@@ -825,6 +825,9 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
       // expires in 2 years
       o.expires = o.expires || 365 * 2;
 
+      // set path to root
+      o.path = o.path || '/';
+
       // call init function
       this.init();
     } 
