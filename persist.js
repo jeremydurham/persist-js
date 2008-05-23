@@ -22,6 +22,7 @@
 
 /**
  * Persist - top-level namespace for Persist library.
+ * @namespace
  */
 Persist = (function() {
   var VERSION = '0.1.0', P, B, esc, init, empty, ec;
@@ -46,7 +47,12 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
   // empty function
   empty = function() { };
 
-  // escape spaces in name
+  /**
+   * Escape spaces and underscores in name.  Used to generate a "safe"
+   * key from a name.
+   *
+   * @private
+   */
   esc = function(str) {
     return 'PS' + str.replace(/_/g, '__').replace(/ /g, '_s');
   };
@@ -59,7 +65,6 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
      * listed in order of capacity, and many browsers
      * support multiple backends, so changing the search order could
      * result in a browser choosing a less capable backend.
-     * 
      */ 
     search_order: [
       // TODO: air
