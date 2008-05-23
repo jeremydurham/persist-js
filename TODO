@@ -7,7 +7,7 @@
 [x] flash
 [ ] air?
 [ ] clear method
-[ ] remove for IE
+[x] remove for IE
 [ ] IE iframe shim option
 [ ] check on localhost compatability
 [ ] full api documentation (including add)
@@ -16,3 +16,4 @@
 [ ] api documentation
 [ ] documentation on same origin policy
 [ ] full usage examples
+[ ] add data_path url and move persist.swf and iframe shim to same directory
