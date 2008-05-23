@@ -751,7 +751,10 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
     }
   };
 
-  // init function
+  /**
+   * Test for available backends and pick the best one.
+   * @private
+   */
   var init = function() {
     var i, l, b, key, fns = C.methods, keys = C.search_order;
 
