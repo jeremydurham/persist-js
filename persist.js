@@ -51,8 +51,6 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
     return 'PS' + str.replace(/_/g, '__').replace(/ /g, '_s');
   };
 
-
-
   C = {
     /* 
      * Backend search order.
@@ -92,6 +90,8 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
     sql: {
       version:  '1', // db schema version
 
+      // XXX: the "IF NOT EXISTS" is a sqlite-ism; fortunately all the 
+      // known DB implementations (safari and gears) use sqlite
       create:   "CREATE TABLE IF NOT EXISTS persist_data (k TEXT UNIQUE NOT NULL PRIMARY KEY, v TEXT NOT NULL)",
       get:      "SELECT v FROM persist_data WHERE k = ?",
       set:      "INSERT INTO persist_data(k, v) VALUES (?, ?)",
@@ -119,7 +119,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
 
   // built-in backends
   B = {
-    // gears db backend (webkit, Safari 3.1+)
+    // gears db backend
     // (src: http://code.google.com/apis/gears/api_database.html)
     gears: {
       // no known limit
@@ -158,6 +158,8 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
           // excluding the following characters:
           //
           //   / \ : * ? " < > | ; ,
+          //
+          // (this constraint is enforced in the Store constructor)
           db.open(esc(this.name));
 
           // create table
@@ -173,17 +175,19 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
 
           // begin transaction
           this.transaction(function (t) {
+            var is_valid, val;
             // exec query
             r = t.execute(sql, [key]);
 
-            // call callback
-            if (r.isValidRow())
-              fn.call(scope || this, true, r.field(0));
-            else
-              fn.call(scope || this, false, null);
+            // check result and get value
+            is_valid = r.isValidRow();
+            val = is_valid ? r.field(0) : null;
 
             // close result set
             r.close();
+
+            // call callback
+            fn.call(scope || this, is_valid, val);
           });
         },
 
@@ -199,18 +203,18 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
             // exec set query
             t.execute(sql, [key, val]).close();
             
-            // run callback
+            // run callback (TODO: get old value)
             if (fn)
               fn.call(scope || this, true, val);
           });
         },
 
-        // begin remove transaction
         remove: function(key, fn, scope) {
           var get_sql = C.sql.get;
               sql = C.sql.remove,
-              r, val;
+              r, val = null, is_valid = false;
 
+          // begin remove transaction
           this.transaction(function(t) {
             // if a callback was defined, then get the old
             // value before removing it
@@ -218,29 +222,24 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
               // exec get query
               r = t.execute(get_sql, [key]);
 
-              if (r.isValidRow()) {
-                // key exists, get value 
-                val = r.field(0);
-
-                // exec remove query
-                t.execute(sql, [key]).close();
-
-                // exec callback
-                fn.call(scope || this, true, val);
-              } else {
-                // key does not exist, exec callback
-                fn.call(scope || this, false, null);
-              }
+              // check validity and get value
+              is_valid = r.isValidRow();
+              val = is_valid ? r.field(0) : null;
 
               // close result set
               r.close();
-            } else {
-              // no callback was defined, so just remove the
-              // data without checking the old value
+            }
 
+            // exec remove query if no callback was defined, or if a
+            // callback was defined and there was an existing value
+            if (!fn || is_valid) {
               // exec remove query
               t.execute(sql, [key]).close();
             }
+
+            // exec callback
+            if (fn)
+              fn.call(scope || this, is_valid, val);
           });
         } 
       }
@@ -249,6 +248,8 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
     // whatwg db backend (webkit, Safari 3.1+)
     // (src: whatwg and http://webkit.org/misc/DatabaseExample.html)
     whatwg_db: {
+      // size based on DatabaseExample from above (should I increase
+      // this?)
       size:   200 * 1024,
 
       test: function() {
@@ -264,34 +265,36 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
         if (!window.openDatabase(name, C.sql.version, desc, B.whatwg_db.size))
           return false;
 
+        // return true
         return true;
       },
 
       methods: {
         transaction: function(fn) {
+          // lazy create database table;
+          // this is done here because there is no way to
+          // prevent a race condition if the table is created in init()
           if (!this.db_created) {
-            var sql = C.sql.create;
-
             this.db.transaction(function(t) {
               // create table
-              t.executeSql(sql, [], function() {
+              t.executeSql(C.sql.create, [], function() {
                 this.db_created = true;
               });
             }, empty); // trap exception
           } 
 
+          // execute transaction
           this.db.transaction(fn);
         },
 
         init: function() {
-          var desc, size; 
-          
-          // init description and size
-          desc = this.o.about || "Persistent storage for " + this.name;
-          size = this.o.size || B.whatwg_db.size;
-
           // create database handle
-          this.db = openDatabase(this.name, C.sql.version, desc, size);
+          this.db = openDatabase(
+            this.name, 
+            C.sql.version, 
+            this.o.about || ("Persistent storage for " + this.name),
+            this.o.size || B.whatwg_db.size 
+          );
         },
 
         get: function(key, fn, scope) {
@@ -562,6 +565,29 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
             fn.call(scope || this, true, val);
         },
 
+        remove: function(key, fn, scope) {
+          var val;
+
+          // expand key
+          key = esc(key);
+
+          // load data
+          if (!this.o.defer)
+            this.load();
+
+          // get old value and remove attribute
+          val = this.el.getAttribute(key);
+          this.el.removeAttribute(key);
+
+          // save data
+          if (!this.o.defer)
+            this.save();
+
+          // call fn
+          if (fn)
+            fn.call(scope || this, val ? true : false, val);
+        },
+
         load: function() {
           this.el.load(esc(this.name));
         },
@@ -766,7 +792,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
     type: null,
     size: 0,
 
-    // expose init function
+    // XXX: expose init function?
     // init: init,
 
     add: function(o) {
