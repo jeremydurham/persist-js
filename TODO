@@ -7,3 +7,12 @@
 [x] flash
 [ ] air?
 [ ] clear method
+[ ] remove for IE
+[ ] IE iframe shim option
+[ ] check on localhost compatability
+[ ] full api documentation (including add)
+[ ] method to tweak search order
+[ ] check on dojo flash storage (they work around some quirks)
+[ ] api documentation
+[ ] documentation on same origin policy
+[ ] full usage examples
