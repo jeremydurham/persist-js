@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008 Paul Duncan (paul@pablotron.org)
+// Copyright (c) 2008, 2009 Paul Duncan (paul@pablotron.org)
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,9 +28,8 @@
  */
 (function() {
   // We are already defined. Hooray!
-  if (window.google && google.gears) {
+  if (window.google && google.gears)
     return;
-  }
 
   var factory = null;
 
@@ -42,9 +41,8 @@
     try {
       factory = new ActiveXObject('Gears.Factory');
       // privateSetGlobalObject is only required and supported on WinCE.
-      if (factory.getBuildInfo().indexOf('ie_mobile') != -1) {
+      if (factory.getBuildInfo().indexOf('ie_mobile') != -1)
         factory.privateSetGlobalObject(this);
-      }
     } catch (e) {
       // Safari
       if ((typeof navigator.mimeTypes != 'undefined')
@@ -61,22 +59,19 @@
 
   // *Do not* define any objects if Gears is not installed. This mimics the
   // behavior of Gears defining the objects in the future.
-  if (!factory) {
+  if (!factory)
     return;
-  }
 
   // Now set up the objects, being careful not to overwrite anything.
   //
   // Note: In Internet Explorer for Windows Mobile, you can't add properties to
   // the window object. However, global objects are automatically added as
   // properties of the window object in all browsers.
-  if (!window.google) {
+  if (!window.google)
     google = {};
-  }
 
-  if (!google.gears) {
+  if (!google.gears)
     google.gears = {factory: factory};
-  }
 })();
 
 /**
@@ -84,7 +79,7 @@
  * @namespace
  */
 Persist = (function() {
-  var VERSION = '0.1.1', P, B, esc, init, empty, ec;
+  var VERSION = '0.2.0', P, B, esc, init, empty, ec;
 
   // easycookie 0.2.1 (pre-minified)
   // (see http://pablotron.org/software/easy_cookie/)
