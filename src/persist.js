@@ -31,35 +31,36 @@
   if (window.google && google.gears)
     return;
 
-  var factory = null;
+  // factory 
+  var F = null;
 
   // Firefox
   if (typeof GearsFactory != 'undefined') {
-    factory = new GearsFactory();
+    F = new GearsFactory();
   } else {
     // IE
     try {
-      factory = new ActiveXObject('Gears.Factory');
+      F = new ActiveXObject('Gears.Factory');
       // privateSetGlobalObject is only required and supported on WinCE.
-      if (factory.getBuildInfo().indexOf('ie_mobile') != -1)
-        factory.privateSetGlobalObject(this);
+      if (F.getBuildInfo().indexOf('ie_mobile') != -1)
+        F.privateSetGlobalObject(this);
     } catch (e) {
       // Safari
       if ((typeof navigator.mimeTypes != 'undefined')
            && navigator.mimeTypes["application/x-googlegears"]) {
-        factory = document.createElement("object");
-        factory.style.display = "none";
-        factory.width = 0;
-        factory.height = 0;
-        factory.type = "application/x-googlegears";
-        document.documentElement.appendChild(factory);
+        F = document.createElement("object");
+        F.style.display = "none";
+        F.width = 0;
+        F.height = 0;
+        F.type = "application/x-googlegears";
+        document.documentElement.appendChild(F);
       }
     }
   }
 
   // *Do not* define any objects if Gears is not installed. This mimics the
   // behavior of Gears defining the objects in the future.
-  if (!factory)
+  if (!F)
     return;
 
   // Now set up the objects, being careful not to overwrite anything.
@@ -71,7 +72,7 @@
     google = {};
 
   if (!google.gears)
-    google.gears = {factory: factory};
+    google.gears = {factory: F};
 })();
 
 /**
