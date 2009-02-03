@@ -20,12 +20,71 @@
 // THE SOFTWARE.
 //
 
+
+/* 
+ * The contents of gears_init.js; we need this because Chrome supports
+ * Gears out of the box, but still requires this constructor.  Note that
+ * if you include gears_init.js then this function does nothing.
+ */
+(function() {
+  // We are already defined. Hooray!
+  if (window.google && google.gears) {
+    return;
+  }
+
+  var factory = null;
+
+  // Firefox
+  if (typeof GearsFactory != 'undefined') {
+    factory = new GearsFactory();
+  } else {
+    // IE
+    try {
+      factory = new ActiveXObject('Gears.Factory');
+      // privateSetGlobalObject is only required and supported on WinCE.
+      if (factory.getBuildInfo().indexOf('ie_mobile') != -1) {
+        factory.privateSetGlobalObject(this);
+      }
+    } catch (e) {
+      // Safari
+      if ((typeof navigator.mimeTypes != 'undefined')
+           && navigator.mimeTypes["application/x-googlegears"]) {
+        factory = document.createElement("object");
+        factory.style.display = "none";
+        factory.width = 0;
+        factory.height = 0;
+        factory.type = "application/x-googlegears";
+        document.documentElement.appendChild(factory);
+      }
+    }
+  }
+
+  // *Do not* define any objects if Gears is not installed. This mimics the
+  // behavior of Gears defining the objects in the future.
+  if (!factory) {
+    return;
+  }
+
+  // Now set up the objects, being careful not to overwrite anything.
+  //
+  // Note: In Internet Explorer for Windows Mobile, you can't add properties to
+  // the window object. However, global objects are automatically added as
+  // properties of the window object in all browsers.
+  if (!window.google) {
+    google = {};
+  }
+
+  if (!google.gears) {
+    google.gears = {factory: factory};
+  }
+})();
+
 /**
  * Persist - top-level namespace for Persist library.
  * @namespace
  */
 Persist = (function() {
-  var VERSION = '0.1.0', P, B, esc, init, empty, ec;
+  var VERSION = '0.1.1', P, B, esc, init, empty, ec;
 
   // easycookie 0.2.1 (pre-minified)
   // (see http://pablotron.org/software/easy_cookie/)
@@ -622,7 +681,9 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
           return this.name + B.cookie.delim + key;
         },
 
-        get: function(key, val, fn, scope) {
+        get: function(key, fn, scope) {
+          var val;
+
           // expand key 
           key = this.key(key);
 
