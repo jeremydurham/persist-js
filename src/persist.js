@@ -123,10 +123,10 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
      */ 
     search_order: [
       // TODO: air
-      'gears',
       'localstorage',
       'whatwg_db', 
       'globalstorage', 
+      'gears',
       'flash',
       'ie', 
       'cookie'
@@ -454,6 +454,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
         },
 
         init: function() {
+          alert('domain = ' + this.o.domain);
           this.store = globalStorage[this.o.domain];
         },
 
@@ -906,7 +907,19 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
       this.name = name;
 
       // get domain (XXX: does this localdomain fix work?)
-      o.domain = o.domain || location.hostname || 'localhost.localdomain';
+      o.domain = o.domain || location.host || 'localhost';
+      
+      // strip port from domain (XXX: will this break ipv6?)
+      o.domain = o.domain.replace(/:\d+$/, '')
+
+      // append localdomain to domains w/o '."
+      // (see https://bugzilla.mozilla.org/show_bug.cgi?id=357323)
+      // (file://localhost/ works, see: 
+      // https://bugzilla.mozilla.org/show_bug.cgi?id=469192)
+/* 
+ *       if (!o.domain.match(/\./))
+ *         o.domain += '.localdomain';
+ */ 
 
       this.o = o;
 
