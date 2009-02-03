@@ -569,7 +569,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
         var el = document.createElement('div');
 
         // set element properties
-        el.id = id;
+        el.setAttribute('id', id);
         el.style.display = 'none';
         // el.addBehavior('#default#userdata');
         el.style.behavior = "url('#default#userData')";
