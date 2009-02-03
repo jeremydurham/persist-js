@@ -571,7 +571,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
         // set element properties
         el.id = id;
         el.style.display = 'none';
-        el.addBehavior('#default#userData');
+        el.addBehavior('#_IE_');
 
         // append element to body
         document.body.appendChild(el);
