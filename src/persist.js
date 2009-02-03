@@ -571,7 +571,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
         // set element properties
         el.id = id;
         el.style.display = 'none';
-        el.addBehavior('#default#snapshot');
+        el.addBehavior('#default#userData');
 
         // append element to body
         document.body.appendChild(el);
@@ -650,12 +650,10 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
         },
 
         load: function() {
-          return;
           this.el.load(esc(this.name));
         },
 
         save: function() {
-          return;
           this.el.save(esc(this.name));
         }
       }
