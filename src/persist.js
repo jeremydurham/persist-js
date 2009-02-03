@@ -126,9 +126,9 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
       'localstorage',
       'whatwg_db', 
       'globalstorage', 
+      'ie', 
       'gears',
       'flash',
-      'ie', 
       'cookie'
     ],
 
