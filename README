@@ -16,7 +16,7 @@ Table of Contents
 PersistJS is a JavaScript client-side persistent storage library.
 PersistJS features include:
 
-  * Small (9.3k minified, 3k gzipped)
+  * Small (<10k minified, 3k gzipped)
   * Standalone: Does not need any additional browser plugins or
     JavaScript libraries to work on the vast majority of current
     browsers.
@@ -26,7 +26,7 @@ PersistJS features include:
   * Backwards Compatible: Can fall back to flash or cookies if no
     client-side storage solution for the given browser is available.
   * Forwards Compatible: Supports the upcoming versions of Internet
-    Explorer, Firefox, and Safari (Opera too, if you have Flash).
+    Explorer, Firefox, Chrome, and Safari (Opera too, if you have Flash).
   * Unobtrusive: Capability testing rather than browser detection, so
     newer standards-conformant browsers will automatically be supported.
 
@@ -53,12 +53,13 @@ mechanisms for saving client-side persistent data.  Each of these
 solutions are simpler to use than cookies, can store far more data, and
 are not transmitted along with HTTP requests.  Unfortunately, each
 browser has addressed the problem in a different and incompatible way.
-There are currently 4 different client side persistent data solutions:
+There are currently 5 different client side persistent data solutions:
 
   * globalStorage: Firefox 2.0+, Internet Explorer 8
-  * localStorage: development WebKit
+  * localStorage: development WebKit (Safari, iPhone, etc)
   * openDatabase: Safari 3.1+
   * userdata behavior: Internet Explorer 5.5+
+  * Google Gears: Chrome
 
 Some developers have attempted to address the client side storage
 issue with the following browser plugins:
