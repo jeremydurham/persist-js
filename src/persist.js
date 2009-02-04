@@ -126,8 +126,8 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
       'localstorage',
       'whatwg_db', 
       'globalstorage', 
-      'ie', 
       'gears',
+      'ie', 
       'flash',
       'cookie'
     ],
@@ -437,6 +437,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
     
     // globalstorage backend (globalStorage, FF2+, IE8+)
     // (src: http://developer.mozilla.org/en/docs/DOM:Storage#globalStorage)
+    // https://developer.mozilla.org/En/DOM/Storage
     //
     // TODO: test to see if IE8 uses object literal semantics or
     // getItem/setItem/removeItem semantics
@@ -497,8 +498,11 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
     
     // localstorage backend (globalStorage, FF2+, IE8+)
     // (src: http://www.whatwg.org/specs/web-apps/current-work/#the-localstorage)
+    // also http://msdn.microsoft.com/en-us/library/cc197062(VS.85).aspx#_global
     localstorage: {
       // (unknown?)
+      // ie has the remainingSpace property, see:
+      // http://msdn.microsoft.com/en-us/library/cc197016(VS.85).aspx
       size: -1,
 
       test: function() {
@@ -569,10 +573,11 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
         var el = document.createElement('div');
 
         // set element properties
-        el.setAttribute('id', id);
+        // http://msdn.microsoft.com/en-us/library/ms531424(VS.85).aspx 
+        // http://www.webreference.com/js/column24/userdata.html
+        el.id = id;
         el.style.display = 'none';
-        // el.addBehavior('#default#userdata');
-        el.style.behavior = "url('#default#userData')";
+        el.addBehavior('#default#userdata');
 
         // append element to body
         document.body.appendChild(el);
