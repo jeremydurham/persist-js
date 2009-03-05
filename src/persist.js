@@ -99,6 +99,25 @@ end=c.length;return un(c.substring(len,end));},remove:function(k){var r=me.get(k
 return r;},all:function(){var c=doc.cookie,ps=c.split('; '),i,p,r=[];for(i=0;i<ps.length;i++){p=ps[i].split('=');r.push([un(p[0]),un(p[1])]);}
 return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}());
 
+  // wrapper for Array.prototype.indexOf, since IE doesn't have it
+  var index_of = (function() {
+    if (Array.prototype.indexOf)
+      return function(ary, val) { 
+        return Array.prototype.indexOf.call(ary, val);
+      };
+    else
+      return function(ary, val) {
+        var i, l;
+
+        for (i = 0, l = ary.length; i < l; i++)
+          if (ary[i] == val)
+            return i;
+
+        return -1;
+      };
+  })();
+
+
   // empty function
   empty = function() { };
 
@@ -732,7 +751,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
     flash: {
       test: function() {
         // TODO: better flash detection
-        if (!window.SWFObject || !deconcept || !deconcept.SWFObjectUtil)
+        if (!deconcept || !deconcept.SWFObjectUtil)
           return false;
 
         // get the major version
@@ -758,7 +777,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
             document.body.appendChild(el);
 
             // create new swf object
-            o = new SWFObject(this.o.swf_path || cfg.path, cfg.id, cfg.size.w, cfg.size.h, '8');
+            o = new deconcept.SWFObject(this.o.swf_path || cfg.path, cfg.id, cfg.size.w, cfg.size.h, '8');
 
             // set parameters
             for (key in cfg.args)
@@ -879,7 +898,7 @@ return r;},version:'0.2.1',enabled:false};me.enabled=alive.call(me);return me;}(
     },
 
     remove: function(id) {
-      var ofs = C.search_order.indexOf(id);
+      var ofs = index_of(C.search_order, id);
       if (ofs < 0)
         return;
 
