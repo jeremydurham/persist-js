@@ -209,8 +209,3 @@ if (deconcept.SWFObject.doPrepUnload) {
 }
 /* add Array.push if needed (ie5) */
 if (Array.prototype.push == null) { Array.prototype.push = function(item) { this[this.length] = item; return this.length; }}
-
-/* add some aliases for ease of use/backwards compatibility */
-var getQueryParamValue = deconcept.util.getRequestParameter;
-var FlashObject = deconcept.SWFObject; // for legacy support
-var SWFObject = deconcept.SWFObject;

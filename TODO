@@ -17,3 +17,4 @@
 [ ] documentation on same origin policy
 [ ] full usage examples
 [ ] add data_path url and move persist.swf and iframe shim to same directory
+[ ] add note about serializing stuff with http://www.json.org/json2.js
