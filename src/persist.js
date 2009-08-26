@@ -1186,7 +1186,7 @@ Persist = (function() {
       // strip port from domain (XXX: will this break ipv6?)
       o.domain = o.domain.replace(/:\d+$/, '')
       
-      // Cleanup for IE6
+      // Specifically for IE6 and localhost
       o.domain = (o.domain == 'localhost') ? '' : o.domain;
 
       // append localdomain to domains w/o '."
