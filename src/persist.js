@@ -125,12 +125,13 @@ Persist = (function() {
       r.push(esc(c_key) + '=' + esc(c_val));
 
       // iterate over option keys and check each one
-      for (i = 0; i < KEYS.length; i++) {
-        key = KEYS[i];
+      for (var idx = 0; idx < KEYS.length; idx++) {
+        key = KEYS[idx];
         val = opt[key];
-        if (val) {
+        if (val){
             r.push(key + '=' + val);
         }
+          
       }
 
       // append secure (if specified)
@@ -140,7 +141,7 @@ Persist = (function() {
 
       // build and return result string
       return r.join('; ');
-    }
+    };
 
     /*
      * Check to see if cookies are enabled.
@@ -160,7 +161,7 @@ Persist = (function() {
       // return cookie test
       this.enabled = (this.remove(k) == v);
       return this.enabled;
-    }
+    };
 
     // public methods
 
@@ -208,9 +209,11 @@ Persist = (function() {
 
         // set remaining keys
         var keys = ['path', 'domain', 'secure'];
-        for (i = 0; i < keys.length; i++)
-          if (opt[keys[i]])
-            cfg[keys[i]] = opt[keys[i]];
+        for (var i = 0; i < keys.length; i++){
+          if (opt[keys[i]]){
+              cfg[keys[i]] = opt[keys[i]];
+          }
+        }
 
         var r = cookify(key, val, cfg);
         doc.cookie = r;
@@ -256,13 +259,15 @@ Persist = (function() {
             end;
 
         // check to see if key exists
-        if ((!ofs && key != sub) || ofs < 0)
-          return null;
+        if ((!ofs && key != sub) || ofs < 0) {
+            return null;
+        }
 
         // grab end of value
         end = c.indexOf(';', len);
-        if (end < 0) 
-          end = c.length;
+        if (end < 0) {
+            end = c.length;
+        }
 
         // return unescaped value
         return un(c.substring(len, end));
@@ -303,8 +308,8 @@ Persist = (function() {
             i, p, r = [];
 
         // iterate over each key=val pair and grab the key
-        for (var i = 0; i < ps.length; i++) {
-          p = ps[i].split('=');
+        for (var idx = 0; idx < ps.length; idx++) {
+          p = ps[idx].split('=');
           r.push(un(p[0]));
         }
 
@@ -327,8 +332,8 @@ Persist = (function() {
             i, p, r = [];
 
         // iterate over each key=val pair and grab the key
-        for (var i = 0; i < ps.length; i++) {
-          p = ps[i].split('=');
+        for (var idx = 0; idx < ps.length; idx++) {
+          p = ps[idx].split('=');
           r.push([un(p[0]), un(p[1])]);
         }
 
@@ -361,20 +366,23 @@ Persist = (function() {
   
   // wrapper for Array.prototype.indexOf, since IE doesn't have it
   var index_of = (function() {
-    if (Array.prototype.indexOf)
+    if (Array.prototype.indexOf){
       return function(ary, val) { 
         return Array.prototype.indexOf.call(ary, val);
       };
-    else
+    } else {
       return function(ary, val) {
         var i, l;
 
-        for (var i = 0, l = ary.length; i < l; i++)
-          if (ary[i] == val)
-            return i;
+        for (var idx = 0, len = ary.length; idx < len; idx++){
+          if (ary[idx] == val){
+              return idx;
+          }
+        }
 
         return -1;
       };
+    }
   })();
 
 
@@ -412,7 +420,7 @@ Persist = (function() {
     ],
 
     // valid name regular expression
-    name_re: /^[a-z][a-z0-9_ -]+$/i,
+    name_re: /^[a-z][a-z0-9_ \-]+$/i,
 
     // list of backend methods
     methods: [
@@ -509,8 +517,9 @@ Persist = (function() {
           var r, sql = C.sql.get;
 
           // if callback isn't defined, then return
-          if (!fn)
-            return;
+          if (!fn){
+              return;
+          }
 
           // begin transaction
           this.transaction(function (t) {
@@ -543,15 +552,14 @@ Persist = (function() {
             t.execute(sql, [key, val]).close();
             
             // run callback (TODO: get old value)
-            if (fn)
-              fn.call(scope || this, true, val);
+            if (fn){
+                fn.call(scope || this, true, val);
+            }
           });
         },
 
         remove: function(key, fn, scope) {
-          var get_sql = C.sql.get;
-              sql = C.sql.remove,
-              r, val = null, is_valid = false;
+          var get_sql = C.sql.get, sql = C.sql.remove, r, val = null, is_valid = false;
 
           // begin remove transaction
           this.transaction(function(t) {
@@ -577,8 +585,9 @@ Persist = (function() {
             }
 
             // exec callback
-            if (fn)
-              fn.call(scope || this, is_valid, val);
+            if (fn){
+                fn.call(scope || this, is_valid, val);
+            }
           });
         } 
       }
@@ -596,13 +605,15 @@ Persist = (function() {
             desc = 'Persistent database test.';
 
         // test for openDatabase
-        if (!window.openDatabase)
-          return false;
+        if (!window.openDatabase){
+            return false;
+        }
 
         // make sure openDatabase works
         // XXX: will this leak a db handle and/or waste space?
-        if (!window.openDatabase(name, C.sql.version, desc, B.whatwg_db.size))
-          return false;
+        if (!window.openDatabase(name, C.sql.version, desc, B.whatwg_db.size)){
+            return false;
+        }
 
         // return true
         return true;
@@ -632,7 +643,7 @@ Persist = (function() {
             this.name, 
             C.sql.version, 
             this.o.about || ("Persistent storage for " + this.name),
-            this.o.size || B.whatwg_db.size 
+            this.o.size || (B.whatwg_db.size)
           );
         },
 
@@ -640,8 +651,9 @@ Persist = (function() {
           var sql = C.sql.get;
 
           // if callback isn't defined, then return
-          if (!fn)
-            return;
+          if (!fn){
+              return;
+          }
 
           // get callback scope
           scope = scope || this;
@@ -649,10 +661,11 @@ Persist = (function() {
           // begin transaction
           this.transaction(function (t) {
             t.executeSql(sql, [key], function(t, r) {
-              if (r.rows.length > 0)
-                fn.call(scope, true, r.rows.item(0)['v']);
-              else
-                fn.call(scope, false, null);
+              if (r.rows.length > 0){
+                  fn.call(scope, true, r.rows.item(0).v);
+              } else {
+                  fn.call(scope, false, null);
+              }
             });
           });
         },
@@ -668,8 +681,9 @@ Persist = (function() {
               // exec set query
               t.executeSql(sql, [key, val], function(t, r) {
                 // run callback
-                if (fn)
-                  fn.call(scope || this, true, val);
+                if (fn){
+                    fn.call(scope || this, true, val);
+                }
               });
             });
           });
@@ -690,7 +704,7 @@ Persist = (function() {
               t.executeSql(get_sql, [key], function(t, r) {
                 if (r.rows.length > 0) {
                   // key exists, get value 
-                  var val = r.rows.item(0)['v'];
+                  var val = r.rows.item(0).v;
 
                   // exec remove query
                   t.executeSql(sql, [key], function(t, r) {
@@ -731,7 +745,7 @@ Persist = (function() {
                   domain = this.o.domain;
               }
               try{
-                  globalStorage[domain];
+                  var dontcare = globalStorage[domain];
                   return true;
               } catch(e) {
                   if (window.console && window.console.warn) {
@@ -757,8 +771,9 @@ Persist = (function() {
           // expand key
           key = this.key(key);
 
-          if (fn)
-            fn.call(scope || this, true, this.store.getItem(key));
+          if (fn){
+              fn.call(scope || this, true, this.store.getItem(key));
+          }
         },
 
         set: function(key, val, fn, scope) {
@@ -768,8 +783,9 @@ Persist = (function() {
           // set value
           this.store.setItem(key, val);
 
-          if (fn)
-            fn.call(scope || this, true, val);
+          if (fn){
+              fn.call(scope || this, true, val);
+          }
         },
 
         remove: function(key, fn, scope) {
@@ -784,8 +800,9 @@ Persist = (function() {
           // delete value
           this.store.removeItem(key);
 
-          if (fn)
-            fn.call(scope || this, (val !== null), val);
+          if (fn){
+              fn.call(scope || this, (val !== null), val);
+          }
         } 
       }
     }, 
@@ -816,8 +833,9 @@ Persist = (function() {
           // expand key
           key = this.key(key);
 
-          if (fn)
-            fn.call(scope || this, true, this.store.getItem(key));
+          if (fn){
+              fn.call(scope || this, true, this.store.getItem(key));
+          }
         },
 
         set: function(key, val, fn, scope) {
@@ -827,8 +845,9 @@ Persist = (function() {
           // set value
           this.store.setItem(key, val);
 
-          if (fn)
-            fn.call(scope || this, true, val);
+          if (fn){
+              fn.call(scope || this, true, val);
+          }
         },
 
         remove: function(key, fn, scope) {
@@ -843,8 +862,9 @@ Persist = (function() {
           // delete value
           this.store.removeItem(key);
 
-          if (fn)
-            fn.call(scope || this, (val !== null), val);
+          if (fn){
+              fn.call(scope || this, (val !== null), val);
+          }
         } 
       }
     }, 
@@ -888,8 +908,9 @@ Persist = (function() {
           this.el = B.ie.make_userdata(id);
 
           // load data
-          if (this.o.defer)
-            this.load();
+          if (this.o.defer){
+              this.load();
+          }
         },
 
         get: function(key, fn, scope) {
@@ -899,15 +920,17 @@ Persist = (function() {
           key = esc(key);
 
           // load data
-          if (!this.o.defer)
-            this.load();
+          if (!this.o.defer){
+              this.load();
+          }
 
           // get value
           val = this.el.getAttribute(key);
 
           // call fn
-          if (fn)
-            fn.call(scope || this, val ? true : false, val);
+          if (fn){
+              fn.call(scope || this, val ? true : false, val);
+          }
         },
 
         set: function(key, val, fn, scope) {
@@ -918,12 +941,14 @@ Persist = (function() {
           this.el.setAttribute(key, val);
 
           // save data
-          if (!this.o.defer)
-            this.save();
+          if (!this.o.defer){
+              this.save();
+          }
 
           // call fn
-          if (fn)
-            fn.call(scope || this, true, val);
+          if (fn){
+              fn.call(scope || this, true, val);
+          }
         },
 
         remove: function(key, fn, scope) {
@@ -933,20 +958,23 @@ Persist = (function() {
           key = esc(key);
 
           // load data
-          if (!this.o.defer)
-            this.load();
+          if (!this.o.defer){
+              this.load();
+          }
 
           // get old value and remove attribute
           val = this.el.getAttribute(key);
           this.el.removeAttribute(key);
 
           // save data
-          if (!this.o.defer)
-            this.save();
+          if (!this.o.defer){
+              this.save();
+          }
 
           // call fn
-          if (fn)
-            fn.call(scope || this, val ? true : false, val);
+          if (fn){
+              fn.call(scope || this, val ? true : false, val);
+          }
         },
 
         load: function() {
@@ -988,8 +1016,9 @@ Persist = (function() {
           val = ec.get(key);
 
           // call fn
-          if (fn)
-            fn.call(scope || this, val != null, val);
+          if (fn){
+              fn.call(scope || this, val !== null, val);
+          }
         },
 
         set: function(key, val, fn, scope) {
@@ -1000,22 +1029,23 @@ Persist = (function() {
           ec.set(key, val, this.o);
 
           // call fn
-          if (fn)
-            fn.call(scope || this, true, val);
+          if (fn){
+              fn.call(scope || this, true, val);
+          }
         },
 
         remove: function(key, val, fn, scope) {
-          var val;
 
           // expand key 
           key = this.key(key);
 
           // remove cookie
-          val = ec.remove(key)
+          val = ec.remove(key);
 
           // call fn
-          if (fn)
-            fn.call(scope || this, val != null, val);
+          if (fn){
+              fn.call(scope || this, val !== null, val);
+          }
         } 
       }
     },
@@ -1026,8 +1056,9 @@ Persist = (function() {
     flash: {
       test: function() {
         // TODO: better flash detection
-        if (!deconcept || !deconcept.SWFObjectUtil)
-          return false;
+        if (!deconcept || !deconcept.SWFObjectUtil){
+            return false;
+        }
 
         // get the major version
         var major = deconcept.SWFObjectUtil.getPlayerVersion().major;
@@ -1055,8 +1086,11 @@ Persist = (function() {
             o = new deconcept.SWFObject(this.o.swf_path || cfg.path, cfg.id, cfg.size.w, cfg.size.h, '8');
 
             // set parameters
-            for (key in cfg.args)
-              o.addVariable(key, cfg.args[key]);
+            for (key in cfg.args){
+                if (cfg.args[key] != 'function') {
+                    o.addVariable(key, cfg.args[key]);
+                }
+            }
 
             // write flash object
             o.write(el);
@@ -1079,8 +1113,9 @@ Persist = (function() {
           val = this.el.get(this.name, key);
 
           // call handler
-          if (fn)
-            fn.call(scope || this, val !== null, val);
+          if (fn){
+              fn.call(scope || this, val !== null, val);
+          }
         },
 
         set: function(key, val, fn, scope) {
@@ -1093,8 +1128,9 @@ Persist = (function() {
           old_val = this.el.set(this.name, key, val);
 
           // call handler
-          if (fn)
-            fn.call(scope || this, true, val);
+          if (fn){
+              fn.call(scope || this, true, val);
+          }
         },
 
         remove: function(key, fn, scope) {
@@ -1107,8 +1143,9 @@ Persist = (function() {
           val = this.el.remove(this.name, key);
 
           // call handler
-          if (fn)
-            fn.call(scope || this, true, val);
+          if (fn){
+              fn.call(scope || this, true, val);
+          }
         }
       }
     }
@@ -1118,30 +1155,32 @@ Persist = (function() {
    * Test for available backends and pick the best one.
    * @private
    */
-  var init = function() {
+  init = function() {
     var i, l, b, key, fns = C.methods, keys = C.search_order;
 
     // set all functions to the empty function
-    for (var i = 0, l = fns.length; i < l; i++) 
-      P.Store.prototype[fns[i]] = empty;
+    for (var idx = 0, len = fns.length; idx < len; idx++) {
+        P.Store.prototype[fns[idx]] = empty;
+    }
 
     // clear type and size
     P.type = null;
     P.size = -1;
 
     // loop over all backends and test for each one
-    for (var i = 0, l = keys.length; !P.type && i < l; i++) {
-      b = B[keys[i]];
+    for (var idx2 = 0, len2 = keys.length; !P.type && idx2 < len2; idx2++) {
+      b = B[keys[idx2]];
 
       // test for backend
       if (b.test()) {
         // found backend, save type and size
-        P.type = keys[i];
+        P.type = keys[idx2];
         P.size = b.size;
 
         // extend store prototype with backend methods
-        for (key in b.methods)
-          P.Store.prototype[key] = b.methods[key];
+        for (key in b.methods) {
+            P.Store.prototype[key] = b.methods[key];
+        }
       }
     }
 
@@ -1174,8 +1213,9 @@ Persist = (function() {
 
     remove: function(id) {
       var ofs = index_of(C.search_order, id);
-      if (ofs < 0)
-        return;
+      if (ofs < 0){
+          return;
+      }
 
       // remove from search order
       C.search_order.splice(ofs, 1);
@@ -1193,15 +1233,17 @@ Persist = (function() {
     // store API
     Store: function(name, o) {
       // verify name
-      if (!C.name_re.exec(name))
-        throw new Error("Invalid name");
+      if (!C.name_re.exec(name)){
+          throw new Error("Invalid name");
+      }
 
       // XXX: should we lazy-load type?
       // if (!P._init)
       //   init();
 
-      if (!P.type)
-        throw new Error("No suitable storage found");
+      if (!P.type){
+          throw new Error("No suitable storage found");
+      }
 
       o = o || {};
       this.name = name;
@@ -1210,7 +1252,7 @@ Persist = (function() {
       o.domain = o.domain || location.host || 'localhost';
       
       // strip port from domain (XXX: will this break ipv6?)
-      o.domain = o.domain.replace(/:\d+$/, '')
+      o.domain = o.domain.replace(/:\d+$/, '');
       
       // Specifically for IE6 and localhost
       o.domain = (o.domain == 'localhost') ? '' : o.domain;
