@@ -28,8 +28,9 @@
  */
 (function() {
   // We are already defined. Hooray!
-  if (window.google && google.gears)
-    return;
+  if (window.google && google.gears){
+      return;
+  }
 
   // factory 
   var F = null;
@@ -42,12 +43,13 @@
     try {
       F = new ActiveXObject('Gears.Factory');
       // privateSetGlobalObject is only required and supported on WinCE.
-      if (F.getBuildInfo().indexOf('ie_mobile') != -1)
-        F.privateSetGlobalObject(this);
+      if (F.getBuildInfo().indexOf('ie_mobile') != -1){
+          F.privateSetGlobalObject(this);
+      }
+        
     } catch (e) {
       // Safari
-      if ((typeof navigator.mimeTypes != 'undefined')
-           && navigator.mimeTypes["application/x-googlegears"]) {
+      if ((typeof navigator.mimeTypes != 'undefined') && navigator.mimeTypes["application/x-googlegears"]) {
         F = document.createElement("object");
         F.style.display = "none";
         F.width = 0;
@@ -60,19 +62,24 @@
 
   // *Do not* define any objects if Gears is not installed. This mimics the
   // behavior of Gears defining the objects in the future.
-  if (!F)
-    return;
+  if (!F){
+      return;
+  }
+    
 
   // Now set up the objects, being careful not to overwrite anything.
   //
   // Note: In Internet Explorer for Windows Mobile, you can't add properties to
   // the window object. However, global objects are automatically added as
   // properties of the window object in all browsers.
-  if (!window.google)
-    google = {};
+  if (!window.google){
+      google = {};
+  }
 
-  if (!google.gears)
-    google.gears = {factory: F};
+  if (!google.gears){
+      google.gears = {factory: F};
+  }
+    
 })();
 
 /**
@@ -103,7 +110,7 @@ Persist = (function() {
       var r = new Date();
       r.setTime(r.getTime());
       return r;
-    }
+    };
 
     /*
      * Convert the given key/value pair to a cookie.
@@ -120,13 +127,16 @@ Persist = (function() {
       // iterate over option keys and check each one
       for (i = 0; i < KEYS.length; i++) {
         key = KEYS[i];
-        if (val = opt[key])
-          r.push(key + '=' + val);
+        val = opt[key];
+        if (val) {
+            r.push(key + '=' + val);
+        }
       }
 
       // append secure (if specified)
-      if (opt.secure)
-        r.push('secure');
+      if (opt.secure){
+          r.push('secure');
+      }
 
       // build and return result string
       return r.join('; ');
@@ -293,7 +303,7 @@ Persist = (function() {
             i, p, r = [];
 
         // iterate over each key=val pair and grab the key
-        for (i = 0; i < ps.length; i++) {
+        for (var i = 0; i < ps.length; i++) {
           p = ps[i].split('=');
           r.push(un(p[0]));
         }
@@ -317,7 +327,7 @@ Persist = (function() {
             i, p, r = [];
 
         // iterate over each key=val pair and grab the key
-        for (i = 0; i < ps.length; i++) {
+        for (var i = 0; i < ps.length; i++) {
           p = ps[i].split('=');
           r.push([un(p[0]), un(p[1])]);
         }
@@ -359,7 +369,7 @@ Persist = (function() {
       return function(ary, val) {
         var i, l;
 
-        for (i = 0, l = ary.length; i < l; i++)
+        for (var i = 0, l = ary.length; i < l; i++)
           if (ary[i] == val)
             return i;
 
@@ -381,7 +391,7 @@ Persist = (function() {
     return 'PS' + str.replace(/_/g, '__').replace(/ /g, '_s');
   };
 
-  C = {
+  var C = {
     /* 
      * Backend search order.
      * 
@@ -715,7 +725,23 @@ Persist = (function() {
       size: 5 * 1024 * 1024,
 
       test: function() {
-        return window.globalStorage ? true : false;
+          if (window.globalStorage) {
+              var domain = '127.0.0.1';
+              if (this.o && this.o.domain) {
+                  domain = this.o.domain;
+              }
+              try{
+                  globalStorage[domain];
+                  return true;
+              } catch(e) {
+                  if (window.console && window.console.warn) {
+                      console.warn("globalStorage exists, but couldn't use it because your browser is running on domain:", domain);
+                  }
+                  return false;
+              }
+          } else {
+              return false;
+          }
       },
 
       methods: {
@@ -1096,7 +1122,7 @@ Persist = (function() {
     var i, l, b, key, fns = C.methods, keys = C.search_order;
 
     // set all functions to the empty function
-    for (i = 0, l = fns.length; i < l; i++) 
+    for (var i = 0, l = fns.length; i < l; i++) 
       P.Store.prototype[fns[i]] = empty;
 
     // clear type and size
@@ -1104,7 +1130,7 @@ Persist = (function() {
     P.size = -1;
 
     // loop over all backends and test for each one
-    for (i = 0, l = keys.length; !P.type && i < l; i++) {
+    for (var i = 0, l = keys.length; !P.type && i < l; i++) {
       b = B[keys[i]];
 
       // test for backend
