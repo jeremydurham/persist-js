@@ -5,10 +5,7 @@ Test = {
   },
 
   load: function() {
-    Test.store.get('some_key', function(ok, val) {
-      if (ok)
-        Test.get('data').value = val;
-    });
+    Test.get('data').value = Test.store.get('some_key' );
   },
 
   save: function() {
@@ -17,10 +14,7 @@ Test = {
   },
 
   load2: function() {
-    Test.store2.get('some_key', function(ok, val) {
-      if (ok)
-        Test.get('data2').value = val;
-    });
+    Test.get('data2').value = Test.store2.get('some_key' )
   },
 
   save2: function() {
