@@ -413,7 +413,6 @@ Persist = (function() {
       'localstorage',
       'globalstorage', 
       'gears',
-      'whatwg_db', 
       'cookie',
       'ie', 
       'flash'
@@ -480,15 +479,17 @@ Persist = (function() {
       methods: {
         transaction: function(fn) {
           var db = this.db;
+          var ret;
 
           // begin transaction
           db.execute('BEGIN').close();
 
           // call callback fn
-          fn.call(this, db);
+          ret = fn.call(this, db);
 
           // commit changes
           db.execute('COMMIT').close();
+          return ret;
         },
 
         init: function() {
@@ -513,16 +514,11 @@ Persist = (function() {
           db.execute(C.sql.create).close();
         },
 
-        get: function(key, fn, scope) {
+        get: function(key, scope) {
           var r, sql = C.sql.get;
 
-          // if callback isn't defined, then return
-          if (!fn){
-              return;
-          }
-
           // begin transaction
-          this.transaction(function (t) {
+          var ret = this.transaction(function (t) {
             var is_valid, val;
             // exec query
             r = t.execute(sql, [key]);
@@ -534,9 +530,9 @@ Persist = (function() {
             // close result set
             r.close();
 
-            // call callback
-            fn.call(scope || this, is_valid, val);
+            return val;
           });
+          return ret;
         },
 
         set: function(key, val, fn, scope) {
@@ -551,11 +547,9 @@ Persist = (function() {
             // exec set query
             t.execute(sql, [key, val]).close();
             
-            // run callback (TODO: get old value)
-            if (fn){
-                fn.call(scope || this, true, val);
-            }
+            return val;
           });
+          return val;
         },
 
         remove: function(key, fn, scope) {
@@ -563,171 +557,15 @@ Persist = (function() {
 
           // begin remove transaction
           this.transaction(function(t) {
-            // if a callback was defined, then get the old
-            // value before removing it
-            if (fn) {
-              // exec get query
-              r = t.execute(get_sql, [key]);
 
-              // check validity and get value
-              is_valid = r.isValidRow();
-              val = is_valid ? r.field(0) : null;
-
-              // close result set
-              r.close();
-            }
-
-            // exec remove query if no callback was defined, or if a
-            // callback was defined and there was an existing value
-            if (!fn || is_valid) {
-              // exec remove query
-              t.execute(sql, [key]).close();
-            }
-
-            // exec callback
-            if (fn){
-                fn.call(scope || this, is_valid, val);
-            }
+          // exec remove query
+          t.execute(sql, [key]).close();
+          return true;
           });
         } 
       }
     }, 
 
-    // whatwg db backend (webkit, Safari 3.1+)
-    // (src: whatwg and http://webkit.org/misc/DatabaseExample.html)
-    whatwg_db: {
-      // size based on DatabaseExample from above (should I increase
-      // this?)
-      size:   200 * 1024,
-
-      test: function() {
-        var name = 'PersistJS Test', 
-            desc = 'Persistent database test.';
-
-        // test for openDatabase
-        if (!window.openDatabase){
-            return false;
-        }
-
-        // make sure openDatabase works
-        // XXX: will this leak a db handle and/or waste space?
-        if (!window.openDatabase(name, C.sql.version, desc, B.whatwg_db.size)){
-            return false;
-        }
-
-        // return true
-        return true;
-      },
-
-      methods: {
-        transaction: function(fn) {
-          // lazy create database table;
-          // this is done here because there is no way to
-          // prevent a race condition if the table is created in init()
-          if (!this.db_created) {
-            this.db.transaction(function(t) {
-              // create table
-              t.executeSql(C.sql.create, [], function() {
-                this.db_created = true;
-              });
-            }, empty); // trap exception
-          } 
-
-          // execute transaction
-          this.db.transaction(fn);
-        },
-
-        init: function() {
-          // create database handle
-          this.db = openDatabase(
-            this.name, 
-            C.sql.version, 
-            this.o.about || ("Persistent storage for " + this.name),
-            this.o.size || (B.whatwg_db.size)
-          );
-        },
-
-        get: function(key, fn, scope) {
-          var sql = C.sql.get;
-
-          // if callback isn't defined, then return
-          if (!fn){
-              return;
-          }
-
-          // get callback scope
-          scope = scope || this;
-
-          // begin transaction
-          this.transaction(function (t) {
-            t.executeSql(sql, [key], function(t, r) {
-              if (r.rows.length > 0){
-                  fn.call(scope, true, r.rows.item(0).v);
-              } else {
-                  fn.call(scope, false, null);
-              }
-            });
-          });
-        },
-
-        set: function(key, val, fn, scope) {
-          var rm_sql = C.sql.remove,
-              sql    = C.sql.set;
-
-          // begin set transaction
-          this.transaction(function(t) {
-            // exec remove query
-            t.executeSql(rm_sql, [key], function() {
-              // exec set query
-              t.executeSql(sql, [key, val], function(t, r) {
-                // run callback
-                if (fn){
-                    fn.call(scope || this, true, val);
-                }
-              });
-            });
-          });
-
-          return val;
-        },
-
-        // begin remove transaction
-        remove: function(key, fn, scope) {
-          var get_sql = C.sql.get;
-              sql = C.sql.remove;
-
-          this.transaction(function(t) {
-            // if a callback was defined, then get the old
-            // value before removing it
-            if (fn) {
-              // exec get query
-              t.executeSql(get_sql, [key], function(t, r) {
-                if (r.rows.length > 0) {
-                  // key exists, get value 
-                  var val = r.rows.item(0).v;
-
-                  // exec remove query
-                  t.executeSql(sql, [key], function(t, r) {
-                    // exec callback
-                    fn.call(scope || this, true, val);
-                  });
-                } else {
-                  // key does not exist, exec callback
-                  fn.call(scope || this, false, null);
-                }
-              });
-            } else {
-              // no callback was defined, so just remove the
-              // data without checking the old value
-
-              // exec remove query
-              t.executeSql(sql, [key]);
-            }
-          });
-        } 
-      }
-    }, 
-    
     // globalstorage backend (globalStorage, FF2+, IE8+)
     // (src: http://developer.mozilla.org/en/docs/DOM:Storage#globalStorage)
     // https://developer.mozilla.org/En/DOM/Storage
@@ -767,28 +605,24 @@ Persist = (function() {
           this.store = globalStorage[this.o.domain];
         },
 
-        get: function(key, fn, scope) {
+        get: function(key, scope) {
           // expand key
           key = this.key(key);
 
-          if (fn){
-              fn.call(scope || this, true, this.store.getItem(key));
-          }
+          return  this.store.getItem(key);
         },
 
-        set: function(key, val, fn, scope) {
+        set: function(key, val, scope) {
           // expand key
           key = this.key(key);
 
           // set value
           this.store.setItem(key, val);
 
-          if (fn){
-              fn.call(scope || this, true, val);
-          }
+          return val;
         },
 
-        remove: function(key, fn, scope) {
+        remove: function(key, scope) {
           var val;
 
           // expand key
@@ -800,9 +634,7 @@ Persist = (function() {
           // delete value
           this.store.removeItem(key);
 
-          if (fn){
-              fn.call(scope || this, (val !== null), val);
-          }
+          return val;
         } 
       }
     }, 
@@ -829,28 +661,23 @@ Persist = (function() {
           this.store = localStorage;
         },
 
-        get: function(key, fn, scope) {
+        get: function(key, scope) {
           // expand key
           key = this.key(key);
-
-          if (fn){
-              fn.call(scope || this, true, this.store.getItem(key));
-          }
+          return this.store.getItem(key);
         },
 
-        set: function(key, val, fn, scope) {
+        set: function(key, val, scope) {
           // expand key
           key = this.key(key);
 
           // set value
           this.store.setItem(key, val);
 
-          if (fn){
-              fn.call(scope || this, true, val);
-          }
+          return val;
         },
 
-        remove: function(key, fn, scope) {
+        remove: function(key, scope) {
           var val;
 
           // expand key
@@ -862,9 +689,7 @@ Persist = (function() {
           // delete value
           this.store.removeItem(key);
 
-          if (fn){
-              fn.call(scope || this, (val !== null), val);
-          }
+          return val;
         } 
       }
     }, 
@@ -913,7 +738,7 @@ Persist = (function() {
           }
         },
 
-        get: function(key, fn, scope) {
+        get: function(key, scope) {
           var val;
 
           // expand key
@@ -927,13 +752,10 @@ Persist = (function() {
           // get value
           val = this.el.getAttribute(key);
 
-          // call fn
-          if (fn){
-              fn.call(scope || this, val ? true : false, val);
-          }
+          return val;
         },
 
-        set: function(key, val, fn, scope) {
+        set: function(key, val, scope) {
           // expand key
           key = esc(key);
           
@@ -945,13 +767,10 @@ Persist = (function() {
               this.save();
           }
 
-          // call fn
-          if (fn){
-              fn.call(scope || this, true, val);
-          }
+          return val;
         },
 
-        remove: function(key, fn, scope) {
+        remove: function(key, scope) {
           var val;
 
           // expand key
@@ -971,10 +790,7 @@ Persist = (function() {
               this.save();
           }
 
-          // call fn
-          if (fn){
-              fn.call(scope || this, val ? true : false, val);
-          }
+          return val;
         },
 
         load: function() {
@@ -1015,10 +831,7 @@ Persist = (function() {
           // get value
           val = ec.get(key);
 
-          // call fn
-          if (fn){
-              fn.call(scope || this, val !== null, val);
-          }
+          return val;
         },
 
         set: function(key, val, fn, scope) {
@@ -1028,13 +841,11 @@ Persist = (function() {
           // save value
           ec.set(key, val, this.o);
 
-          // call fn
-          if (fn){
-              fn.call(scope || this, true, val);
-          }
+          return val;
         },
 
-        remove: function(key, val, fn, scope) {
+        remove: function(key, val, scope) {
+          var val;
 
           // expand key 
           key = this.key(key);
@@ -1042,10 +853,7 @@ Persist = (function() {
           // remove cookie
           val = ec.remove(key);
 
-          // call fn
-          if (fn){
-              fn.call(scope || this, val !== null, val);
-          }
+          return val;
         } 
       }
     },
@@ -1103,7 +911,7 @@ Persist = (function() {
           this.el = B.flash.el;
         },
 
-        get: function(key, fn, scope) {
+        get: function(key, scope) {
           var val;
 
           // escape key
@@ -1112,13 +920,10 @@ Persist = (function() {
           // get value
           val = this.el.get(this.name, key);
 
-          // call handler
-          if (fn){
-              fn.call(scope || this, val !== null, val);
-          }
+          return val;
         },
 
-        set: function(key, val, fn, scope) {
+        set: function(key, val, scope) {
           var old_val;
 
           // escape key
@@ -1127,13 +932,10 @@ Persist = (function() {
           // set value
           old_val = this.el.set(this.name, key, val);
 
-          // call handler
-          if (fn){
-              fn.call(scope || this, true, val);
-          }
+          return old_val;
         },
 
-        remove: function(key, fn, scope) {
+        remove: function(key, scope) {
           var val;
 
           // get key
@@ -1141,11 +943,7 @@ Persist = (function() {
 
           // remove old value
           val = this.el.remove(this.name, key);
-
-          // call handler
-          if (fn){
-              fn.call(scope || this, true, val);
-          }
+          return val;
         }
       }
     }
@@ -1176,7 +974,6 @@ Persist = (function() {
         // found backend, save type and size
         P.type = keys[idx2];
         P.size = b.size;
-
         // extend store prototype with backend methods
         for (key in b.methods) {
             P.Store.prototype[key] = b.methods[key];
@@ -1249,7 +1046,7 @@ Persist = (function() {
       this.name = name;
 
       // get domain (XXX: does this localdomain fix work?)      
-      o.domain = o.domain || location.host || 'localhost';
+      o.domain = o.domain || location.hostname || 'localhost';
       
       // strip port from domain (XXX: will this break ipv6?)
       o.domain = o.domain.replace(/:\d+$/, '');
