@@ -428,7 +428,8 @@ Persist = (function() {
       'set', 
       'remove', 
       'load', 
-      'save'
+      'save',
+      'iterate'
       // TODO: clear method?
     ],
 
@@ -441,7 +442,8 @@ Persist = (function() {
       create:   "CREATE TABLE IF NOT EXISTS persist_data (k TEXT UNIQUE NOT NULL PRIMARY KEY, v TEXT NOT NULL)",
       get:      "SELECT v FROM persist_data WHERE k = ?",
       set:      "INSERT INTO persist_data(k, v) VALUES (?, ?)",
-      remove:   "DELETE FROM persist_data WHERE k = ?" 
+      remove:   "DELETE FROM persist_data WHERE k = ?",
+      keys:     "SELECT * FROM persist_data"
     },
 
     // default flash configuration
@@ -558,15 +560,21 @@ Persist = (function() {
           // commit changes
           db.execute('COMMIT').close();
 
-<<<<<<< HEAD
-          // exec remove query
-          t.execute(sql, [key]).close();
           return true;
-          });
-=======
-          return true;
->>>>>>> removed the  transaction function from gears, and scope parameter from all the functions
-        } 
+        },
+        iterate: function(fn,scope) {
+          var key_sql = C.sql.keys;
+          var r;
+          var db = this.db;
+
+          // exec keys query
+          r = db.execute(key_sql);
+          while (r.isValidRow()) {
+            fn.call(scope || this, r.field(0), r.field(1));
+            r.next();
+          }
+          r.close();
+        }
       }
     }, 
 
@@ -658,7 +666,8 @@ Persist = (function() {
 
       methods: {
         key: function(key) {
-          return esc(this.name) + esc(key);
+          return this.name + '>' + key ;
+          //return esc(this.name) + esc(key);
         },
 
         init: function() {
@@ -694,7 +703,17 @@ Persist = (function() {
           this.store.removeItem(key);
 
           return val;
-        } 
+        },
+
+        iterate : function(fn, scope) {
+          var l = this.store;
+          for (i=0;i<l.length;i++) {
+            keys = l[i].split('>');
+            if ((keys.length == 2) && (keys[0] == this.name)) {
+              fn.call(scope || this,keys[1], l[l[i]]);
+            }
+          }
+        }
       }
     }, 
     
