@@ -40,5 +40,11 @@ Test = {
     // attach callbacks
     Test.get('load2-btn').onclick = Test.load2;
     Test.get('save2-btn').onclick = Test.save2;
+
+    Test.get('iterate-btn').onclick = function() {
+      Test.store2.iterate(function(k,v) {
+          alert(k + " = " + v);
+          });
+    }
   }
 };
