@@ -1,4 +1,4 @@
-PersistJS 0.2.0 README
+PersistJS 0.2.0-ms README
 ======================
 
 Table of Contents
@@ -9,11 +9,15 @@ Table of Contents
   4. Size Limits
   5. Other Limits
   6. Extending PersistJS
-  7. About the Author
+  7. Where is it being used?
+  8. About the Author
 
 1. Introduction
 ---------------
 PersistJS is a JavaScript client-side persistent storage library.
+This version of PersistJS is a fork of original framework with
+changes annotated with [MS]
+
 PersistJS features include:
 
   * Small (<10k minified, 3k gzipped)
@@ -29,11 +33,14 @@ PersistJS features include:
     Explorer, Firefox, Chrome, and Safari (Opera too, if you have Flash).
   * Unobtrusive: Capability testing rather than browser detection, so
     newer standards-conformant browsers will automatically be supported.
+  * Synchronus operation [MS]: Original version of Persist-js supported
+    all operations in asynchronus mode. This was not convenient for most
+    of the projects I was doing, and hence supported this mode.
 
-The latest version of PersistJS is always available online at the
+The latest version of PersistJS-MS is always available online at the
 following URL:
 
-    http://pablotron.org/software/persist-js/
+    http://github.com/mayanks/persist-js
 
 2. Rationale
 ------------
@@ -95,7 +102,8 @@ persistent client-side storage through the following backends:
    * flash:         Flash 8 persistent storage.
    * gears:         Google Gears-based persistent storage.
    * localstorage:  HTML5 draft storage.
-   * whatwg_db:     HTML5 draft database storage.
+   * whatwg_db:     HTML5 draft database storage. [MS: support for this
+                        has been deprecated]
    * globalstorage: HTML5 draft storage (old spec).
    * ie:            Internet Explorer userdata behaviors.
    * cookie:        Cookie-based persistent storage.
@@ -171,23 +179,14 @@ Once you have saved a value to the store, you can read it back,
 like this:
 
     // get value from store and prompt user
-    store.get('some_key', function(ok, val) {
-      if (ok)
-        alert('some_key = ' + val);
-    });
+    val = store.get('some_key')
 
-What's up with the anonymous function?  It turns out that some backends
--- specifically the WHATWG Database (used for Safari 3.1) -- only
-function asynchronously, so using a callback function is the only
-reliable means of ensuring the correct order of operations.  Both
-`set()` and `remove()` accept callback functions as well.  Here's an
-example of removing a key, then performing an operation afterwards:
+Here's an example of removing a key:
 
     // remove key from store and prompt user
-    store.remove('some_key', function(ok, val) {
-      // prompt user
-      alert('some_key was removed');
-    });
+    store.remove('some_key') 
+    // prompt user
+    alert('some_key was removed');
 
 If you're in a hurry, then you can stop reading right now, because
 that's all you need to know!
@@ -272,8 +271,6 @@ where the size limit is unlimited or unknown, `Persist.size` is set to
   * globalstorage:  5 megabytes
   * ie:             64 kilobytes
   * localstorage:   unknown 
-  * whatwg_db:      unknown, although you can request a size with the
-                    `size` attribute; defaults to 200 kilobytes
 
 (Note that the key length is also included in the data size limit).
 
@@ -327,7 +324,21 @@ the EasyCookie page at:
 
   http://pablotron.org/software/easy_cookie/
 
-7. About the Author
+7. Where is it being used?
+-------------------------
+[MS] Persist-JS was picked up for developing a twitter client called
+tDash (http://tdash.org). tDash is the only twitter client which works 
+on your browser, directly talking to twitter. The main essence of this
+client is speed and added flexibility. I modified persist-js library 
+by making all accesses synchronous (at the cost of deprecating whatwg_db) 
+and adding some more features. Overall it increased the performance of 
+the application visually.
+
+8. About the Author
 -------------------
 Paul Duncan (pabs@pablotron.org)
 http://pablotron.org/
+
+Mayank Sharma (mayanks@gmail.com)
+http://mayanks.blogspot.com
+
