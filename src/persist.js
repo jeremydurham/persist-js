@@ -795,7 +795,7 @@ Persist = (function() {
           key = this.key(key);
 
           // get value
-          val = this.store[key];
+          val = this.store.getItem[key];
 
           // delete value
           this.store.removeItem(key);
