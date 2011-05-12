@@ -502,7 +502,7 @@ Persist = (function() {
           db.execute(C.sql.create).close();
         },
 
-        get: function(key ) {
+        get: function(key) {
           var r, sql = C.sql.get;
           var db = this.db;
           var ret;
@@ -545,7 +545,7 @@ Persist = (function() {
           return val;
         },
 
-        remove: function(key ) {
+        remove: function(key) {
           var get_sql = C.sql.get;
               sql = C.sql.remove,
               r, val = null, is_valid = false;
@@ -617,7 +617,7 @@ Persist = (function() {
           this.store = globalStorage[this.o.domain];
         },
 
-        get: function(key ) {
+        get: function(key) {
           // expand key
           key = this.key(key);
 
@@ -634,7 +634,7 @@ Persist = (function() {
           return val;
         },
 
-        remove: function(key ) {
+        remove: function(key) {
           var val;
 
           // expand key
@@ -674,7 +674,7 @@ Persist = (function() {
           this.store = localStorage;
         },
 
-        get: function(key ) {
+        get: function(key) {
           // expand key
           key = this.key(key);
           return this.store.getItem(key);
@@ -705,7 +705,7 @@ Persist = (function() {
           return val;
         },
 
-        iterate : function(fn, scope) {
+        iterate: function(fn, scope) {
           var l = this.store;
           for (i=0;i<l.length;i++) {
             keys = l[i].split('>');
@@ -793,7 +793,7 @@ Persist = (function() {
           return val;
         },
 
-        remove: function(key ) {
+        remove: function(key) {
           var val;
 
           // expand key
@@ -934,7 +934,7 @@ Persist = (function() {
           this.el = B.flash.el;
         },
 
-        get: function(key ) {
+        get: function(key) {
           var val;
 
           // escape key
@@ -958,7 +958,7 @@ Persist = (function() {
           return old_val;
         },
 
-        remove: function(key ) {
+        remove: function(key) {
           var val;
 
           // get key

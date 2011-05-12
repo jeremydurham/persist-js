@@ -1,4 +1,4 @@
-PersistJS 0.2.0-ms README
+PersistJS 0.3.0 README
 ======================
 
 Table of Contents
@@ -15,8 +15,6 @@ Table of Contents
 1. Introduction
 ---------------
 PersistJS is a JavaScript client-side persistent storage library.
-This version of PersistJS is a fork of original framework with
-changes annotated with [MS]
 
 PersistJS features include:
 
@@ -33,14 +31,11 @@ PersistJS features include:
     Explorer, Firefox, Chrome, and Safari (Opera too, if you have Flash).
   * Unobtrusive: Capability testing rather than browser detection, so
     newer standards-conformant browsers will automatically be supported.
-  * Synchronus operation [MS]: Original version of Persist-js supported
-    all operations in asynchronus mode. This was not convenient for most
-    of the projects I was doing, and hence supported this mode.
 
-The latest version of PersistJS-MS is always available online at the
+The latest version of PersistJS is always available online at the
 following URL:
 
-    http://github.com/mayanks/persist-js
+    http://github.com/jeremydurham/persist-js
 
 2. Rationale
 ------------
@@ -102,8 +97,6 @@ persistent client-side storage through the following backends:
    * flash:         Flash 8 persistent storage.
    * gears:         Google Gears-based persistent storage.
    * localstorage:  HTML5 draft storage.
-   * whatwg_db:     HTML5 draft database storage. [MS: support for this
-                        has been deprecated]
    * globalstorage: HTML5 draft storage (old spec).
    * ie:            Internet Explorer userdata behaviors.
    * cookie:        Cookie-based persistent storage.
@@ -204,7 +197,6 @@ These parameters allow you to pass additional information or fine-tune
 the behavior of the data store.  Here's a complete list of the available
 parameters:
 
-  * about:    Description of this data store (used by `whatwg_db`).
   * defer:    Defer saving until `save()` is called (used by `ie`).  See
               below for additional details.
   * domain:   Limit store to given domain or sub-domain (used by `cookie`
@@ -326,19 +318,18 @@ the EasyCookie page at:
 
 7. Where is it being used?
 -------------------------
-[MS] Persist-JS was picked up for developing a twitter client called
-tDash (http://tdash.org). tDash is the only twitter client which works 
-on your browser, directly talking to twitter. The main essence of this
-client is speed and added flexibility. I modified persist-js library 
-by making all accesses synchronous (at the cost of deprecating whatwg_db) 
-and adding some more features. Overall it increased the performance of 
-the application visually.
+* Beacon Interactive Systems (http://www.beaconinteractive.com)
+* MochaUI
+* tDash (http://tdash.org) - the only Twitter client that works in your
+    browser, directly talking to Twitter.
 
 8. About the Author
 -------------------
-Paul Duncan (pabs@pablotron.org)
-http://pablotron.org/
+Paul Duncan (pabs@pablotron.org) - http://pablotron.org/
 
-Mayank Sharma (mayanks@gmail.com)
-http://mayanks.blogspot.com
-
+9. Contributors
+---------------
+Jeremy Durham (jeremydurham@gmail.com) - http://www.jeremydurham.com
+Marcus Spiegel (marcus.spiegel@gmail.com) - http://marcusspiegel.de
+Matt Pizzimenti (mjpizz+github@gmail.com) - http://mjpizz.com
+Mayank Sharma (mayanks@gmail.com) - http://mayanks.blogspot.com
