@@ -87,7 +87,7 @@
  * @namespace
  */
 Persist = (function() {
-  var VERSION = '0.2.0', P, B, esc, init, empty, ec;
+  var VERSION = '0.3.0', P, B, esc, init, empty, ec;
   
   ec = (function() {
     var EPOCH = 'Thu, 01-Jan-1970 00:00:01 GMT',
