@@ -661,7 +661,12 @@ Persist = (function() {
       size: -1,
 
       test: function() {
-        return window.localStorage ? true : false;
+        // FF: Throws a security error when cookies are disabled
+        try {
+          return window.localStorage ? true : false;
+        } catch (e) {
+          return false;
+        }
       },
 
       methods: {
@@ -887,8 +892,12 @@ Persist = (function() {
     flash: {
       test: function() {
         // TODO: better flash detection
-        if (!deconcept || !deconcept.SWFObjectUtil){
-            return false;
+        try {
+          if (!deconcept || !deconcept.SWFObjectUtil){
+              return false;
+          }
+        } catch (e) {
+          return false;
         }
 
         // get the major version
