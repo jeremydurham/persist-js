@@ -459,7 +459,7 @@ Persist = (function() {
       size: { w:1, h:1 },
 
       // arguments passed to flash object
-      args: {
+      params: {
         autostart: true
       }
     } 
@@ -926,10 +926,10 @@ Persist = (function() {
             document.body.appendChild(el);
 
             // create new swf object
-            swfobject.embedSWF(this.o.swf_path || cfg.path, cfg.id, cfg.size.w, cfg.size.h, '8', cfg.args);
-
-            // save flash element
-            B.flash.el = document.getElementById(cfg.id);
+            swfobject.embedSWF(this.o.swf_path || cfg.path, cfg.id, cfg.size.w, cfg.size.h, '8', null, {}, cfg.params, {}, function(o) {
+              // save flash element
+              B.flash.el = o;
+            });
           }
 
           // use singleton flash element
