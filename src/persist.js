@@ -663,6 +663,11 @@ Persist = (function() {
       test: function() {
         // FF: Throws a security error when cookies are disabled
         try {
+          if (window.localStorage && window.localStorage.setItem("test", null) == undefined) {
+            return true;
+          } else {
+            return false;
+          }
           return window.localStorage ? true : false;
         } catch (e) {
           return false;
