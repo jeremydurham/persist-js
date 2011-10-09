@@ -414,7 +414,7 @@ Persist = (function() {
       'globalstorage', 
       'gears',
       'cookie',
-      'ie', 
+      'ie',
       'flash'
     ],
 
@@ -893,7 +893,7 @@ Persist = (function() {
       test: function() {
         // TODO: better flash detection
         try {
-          if (!deconcept || !deconcept.SWFObjectUtil){
+          if (!swfobject){
               return false;
           }
         } catch (e) {
@@ -901,7 +901,7 @@ Persist = (function() {
         }
 
         // get the major version
-        var major = deconcept.SWFObjectUtil.getPlayerVersion().major;
+        var major = swfobject.getFlashPlayerVersion().major;
 
         // check flash version (require 8.0 or newer)
         return (major >= 8) ? true : false;
@@ -910,30 +910,23 @@ Persist = (function() {
       methods: {
         init: function() {
           if (!B.flash.el) {
-            var o, key, el, cfg = C.flash;
+            var key, el, fel, cfg = C.flash;
 
             // create wrapper element
             el = document.createElement('div');
             el.id = cfg.div_id;
 
-            // FIXME: hide flash element
-            // el.style.display = 'none';
+            // create flash element
+            fel = document.createElement('div')
+            fel.id = cfg.id;
+
+            el.appendChild(fel);
 
             // append element to body
             document.body.appendChild(el);
 
             // create new swf object
-            o = new deconcept.SWFObject(this.o.swf_path || cfg.path, cfg.id, cfg.size.w, cfg.size.h, '8');
-
-            // set parameters
-            for (key in cfg.args){
-                if (cfg.args[key] != 'function') {
-                    o.addVariable(key, cfg.args[key]);
-                }
-            }
-
-            // write flash object
-            o.write(el);
+            swfobject.embedSWF(this.o.swf_path || cfg.path, cfg.id, cfg.size.w, cfg.size.h, '8', cfg.args);
 
             // save flash element
             B.flash.el = document.getElementById(cfg.id);
