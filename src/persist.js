@@ -724,11 +724,12 @@ Persist = (function() {
         },
 
         iterate: function(fn, scope) {
-          var l = this.store;
-          for (i=0;i<l.length;i++) {
-            keys = l[i].split('>');
+          var l = this.store, key, keys;
+          for (var i=0;i<l.length;i++) {
+            key = l.key(i);
+            keys = key.split('>');
             if ((keys.length == 2) && (keys[0] == this.name)) {
-              fn.call(scope || this,keys[1], l[l[i]]);
+              fn.call(scope || this,key, l.getItem(key));
             }
           }
         }
