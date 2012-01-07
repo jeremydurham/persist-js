@@ -729,7 +729,7 @@ Persist = (function() {
             key = l.key(i);
             keys = key.split('>');
             if ((keys.length == 2) && (keys[0] == this.name)) {
-              fn.call(scope || this,key, l.getItem(key));
+              fn.call(scope || this,keys[1], l.getItem(key));
             }
           }
         }
