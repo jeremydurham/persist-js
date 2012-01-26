@@ -407,7 +407,7 @@ Persist = (function() {
      * listed in order of capacity, and many browsers
      * support multiple backends, so changing the search order could
      * result in a browser choosing a less capable backend.
-     */ 
+     */     
     search_order: [
       // TODO: air
       'localstorage',
@@ -943,9 +943,10 @@ Persist = (function() {
             swfobject.embedSWF(this.o.swf_path || cfg.path, cfg.id, cfg.size.w, cfg.size.h, '8', null, {}, cfg.params, {}, function(o) {
               // save flash element
               B.flash.el = o.ref;
-              this.el = o.ref;
             });
           }
+          
+          this.el = B.flash.el;
         },
 
         get: function(key) {
