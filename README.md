@@ -1,4 +1,4 @@
-PersistJS 0.3.0 README
+PersistJS 0.3.1 README
 ======================
 
 Table of Contents
