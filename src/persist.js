@@ -942,12 +942,10 @@ Persist = (function() {
             // create new swf object
             swfobject.embedSWF(this.o.swf_path || cfg.path, cfg.id, cfg.size.w, cfg.size.h, '8', null, {}, cfg.params, {}, function(o) {
               // save flash element
-              B.flash.el = o;
+              B.flash.el = o.ref;
+              this.el = o.ref;
             });
           }
-
-          // use singleton flash element
-          this.el = B.flash.el;
         },
 
         get: function(key) {
