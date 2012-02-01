@@ -666,12 +666,20 @@ Persist = (function() {
           // Chrome: window.localStorage is available, but calling set throws a quota exceeded error
           if (window.localStorage && 
               window.localStorage.setItem("test", null) == undefined) {
-                if (/Firefox[\/\s](\d+\.\d+)/.test(navigator.userAgent) && window.location.protocol == 'file:') {
-                  // FF: Fix for Firefox bug when protocol is file: https://bugzilla.mozilla.org/show_bug.cgi?id=507361
-                  return false;
-                } else {
-                  return true;
-                }
+                  if (/Firefox[\/\s](\d+\.\d+)/.test(navigator.userAgent)) {
+                      var ffVersion = RegExp.$1;
+
+                      if (ffVersion >= 9) {
+                          return true;
+                      }
+
+                      // FF: Fix for Firefox bug when protocol is file: https://bugzilla.mozilla.org/show_bug.cgi?id=507361
+                      if (window.location.protocol == 'file:') {
+                          return false;
+                      }
+                  } else {
+                    return true;
+                  }
           } else {
             return false;
           }
