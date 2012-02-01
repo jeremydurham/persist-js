@@ -940,10 +940,7 @@ Persist = (function() {
             document.body.appendChild(el);
 
             // create new swf object
-            swfobject.embedSWF(this.o.swf_path || cfg.path, cfg.id, cfg.size.w, cfg.size.h, '8', null, {}, cfg.params, {}, function(o) {
-              // save flash element
-              B.flash.el = o.ref;
-            });
+            B.flash.el = swfobject.createSWF({ id: cfg.id, data: this.o.swf_path || cfg.path, width: cfg.size.w, height: cfg.size.h }, cfg.params, cfg.id)
           }
           
           this.el = B.flash.el;
