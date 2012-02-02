@@ -546,7 +546,7 @@ Persist = (function() {
         },
 
         remove: function(key) {
-          var get_sql = C.sql.get;
+          var get_sql = C.sql.get,
               sql = C.sql.remove,
               r, val = null, is_valid = false;
           var db = this.db;
@@ -939,7 +939,7 @@ Persist = (function() {
             el.id = cfg.div_id;
 
             // create flash element
-            fel = document.createElement('div')
+            fel = document.createElement('div');
             fel.id = cfg.id;
 
             el.appendChild(fel);
@@ -948,7 +948,7 @@ Persist = (function() {
             document.body.appendChild(el);
 
             // create new swf object
-            B.flash.el = swfobject.createSWF({ id: cfg.id, data: this.o.swf_path || cfg.path, width: cfg.size.w, height: cfg.size.h }, cfg.params, cfg.id)
+            B.flash.el = swfobject.createSWF({ id: cfg.id, data: this.o.swf_path || cfg.path, width: cfg.size.w, height: cfg.size.h }, cfg.params, cfg.id);
           }
           
           this.el = B.flash.el;
