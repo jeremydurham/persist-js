@@ -1113,6 +1113,11 @@ Persist = (function() {
 
       // set path to root
       o.path = o.path || '/';
+      
+      if (this.o.search_order) {
+        C.search_order = this.o.search_order;
+        init();
+      }
 
       // call init function
       this.init();
