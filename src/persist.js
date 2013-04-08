@@ -199,12 +199,17 @@ Persist = (function() {
 
         // if expires is set, convert it from days to milliseconds
         if (opt.expires) {
-          // Needed to assign to a temporary variable because of pass by reference issues
-          var expires = opt.expires * RATIO;
+          if(opt.expires == -1) {
+            cfg.expires = -1
+          }
+          else {
+            // Needed to assign to a temporary variable because of pass by reference issues
+            var expires = opt.expires * RATIO;
 
-          // set cookie expiration date
-          cfg.expires = new Date(now.getTime() + expires);
-          cfg.expires = cfg.expires.toGMTString();
+            // set cookie expiration date
+            cfg.expires = new Date(now.getTime() + expires);
+            cfg.expires = cfg.expires.toGMTString();
+          }
         }
 
         // set remaining keys
