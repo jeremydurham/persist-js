@@ -670,7 +670,8 @@ Persist = (function() {
         try {
           // Chrome: window.localStorage is available, but calling set throws a quota exceeded error
           if (window.localStorage && 
-              window.localStorage.setItem("test", null) == undefined) {
+              window.localStorage.setItem("persistjs_test_local_storage", null) == undefined) {
+                  window.localStorage.removeItem("persistjs_test_local_storage");
                   if (/Firefox[\/\s](\d+\.\d+)/.test(navigator.userAgent)) {
                       var ffVersion = RegExp.$1;
 
