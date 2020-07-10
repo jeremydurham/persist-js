@@ -1,3 +1,8 @@
+![No longer maintained](https://img.shields.io/badge/Maintenance-OFF-red.svg)
+### [DEPRECATED] This repository is no longer maintained
+> This fork is no longer maintained. It is left here for existing projects that may use it to prevent breaking dependencies.
+
+
 PersistJS 0.3.1 README
 ======================
 
